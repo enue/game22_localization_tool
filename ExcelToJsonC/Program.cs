@@ -13,21 +13,8 @@ namespace ExcelToJsonC
         {
             // excelを読み込んで
             // jsonにして吐き出す。
-            var filenames = new []
-            {
-                "Localization",
-                "LocalizationAbility",
-                "LocalizationArticle",
-                "LocalizationBattle",
-                "LocalizationJob",
-                "LocalizationCharacter",
-                "LocalizationUnit",
-                "LocalizationElement",
-                "LocalizationScript",
-                "LocalizationCredit",
-            };
 
-            foreach (var filename in filenames)
+            foreach (var filename in Library.Constants.Filenames)
             {
                 var columnLanguages = new Dictionary<int, string>();
 
