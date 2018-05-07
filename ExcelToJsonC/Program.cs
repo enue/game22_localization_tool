@@ -14,10 +14,10 @@ namespace ExcelToJsonC
             // excelを読み込んで
             // jsonにして吐き出す。
 
-            foreach (var filename in Library.Constants.JsonExcelPaths)
+            for (int index = 0; index < args.Length / 2; ++index)
             {
-                var excelPath = filename.Value;
-                var jsonPath = filename.Key;
+                var excelPath = args[index * 2];
+                var jsonPath = args[index * 2 + 1];
                 var columnLanguages = new Dictionary<int, string>();
                 Console.WriteLine("load " + excelPath);
                 using (var stream = new System.IO.FileStream(excelPath,

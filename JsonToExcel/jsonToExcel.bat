@@ -1,0 +1,11 @@
+"JsonToExcel.exe" ^
+mst_develop_localize_Data/StreamingAssets/Localization.json Localization.xlsx ^
+mst_develop_localize_Data/StreamingAssets/LocalizationAbility.json LocalizationAbility.xlsx ^
+mst_develop_localize_Data/StreamingAssets/LocalizationArticle.json LocalizationArticle.xlsx ^
+mst_develop_localize_Data/StreamingAssets/LocalizationBattle.json LocalizationBattle.xlsx ^
+mst_develop_localize_Data/StreamingAssets/LocalizationJob.json LocalizationJob.xlsx ^
+mst_develop_localize_Data/StreamingAssets/LocalizationCharacter.json LocalizationCharacter.xlsx ^
+mst_develop_localize_Data/StreamingAssets/LocalizationUnit.json LocalizationUnit.xlsx ^
+mst_develop_localize_Data/StreamingAssets/LocalizationElement.json LocalizationElement.xlsx ^
+mst_develop_localize_Data/StreamingAssets/LocalizationScript.json LocalizationScript.xlsx ^
+mst_develop_localize_Data/StreamingAssets/LocalizationCredit.json LocalizationCredit.xlsx

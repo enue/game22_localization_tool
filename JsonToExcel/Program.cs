@@ -10,10 +10,10 @@ namespace JsonToExcel
     {
         static void Main(string[] args)
         {
-            foreach (var filename in Library.Constants.JsonExcelPaths)
+            for (int i = 0; i<args.Length / 2; ++i)
             {
-                var excelPath = filename.Value;
-                var jsonPath = filename.Key;
+                var jsonPath = args[i * 2];
+                var excelPath = args[i * 2 + 1];
                 Console.WriteLine("load " + jsonPath);
                 var jsonString = System.IO.File.ReadAllText(jsonPath);
 
@@ -59,6 +59,7 @@ namespace JsonToExcel
                 }
             }
             Console.WriteLine("finished");
+            Console.ReadKey();
         }
     }
 }
