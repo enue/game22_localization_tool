@@ -1,4 +1,4 @@
-"ExcelToJsonC.exe" ^
+"ExcelToJson.exe" ^
 Localization.xlsx mst_develop_localize_Data/StreamingAssets/Localization.json ^
 LocalizationAbility.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationAbility.json ^
 LocalizationArticle.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationArticle.json ^

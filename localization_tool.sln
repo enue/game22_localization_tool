@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2043
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelToJsonC", "ExcelToJsonC\ExcelToJsonC.csproj", "{4D4AE139-2592-4E7D-AC9B-0AFEA511F65B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelToJson", "ExcelToJson\ExcelToJson.csproj", "{4D4AE139-2592-4E7D-AC9B-0AFEA511F65B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonToExcel", "JsonToExcel\JsonToExcel.csproj", "{4F0F268B-53E1-4C32-8CFE-89D12F4F10B4}"
 EndProject
