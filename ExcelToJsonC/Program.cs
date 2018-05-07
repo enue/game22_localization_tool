@@ -14,16 +14,17 @@ namespace ExcelToJsonC
             // excelを読み込んで
             // jsonにして吐き出す。
 
-            foreach (var filename in Library.Constants.Filenames)
+            foreach (var filename in Library.Constants.JsonExcelPaths)
             {
+                var excelPath = filename.Value;
+                var jsonPath = filename.Key;
                 var columnLanguages = new Dictionary<int, string>();
-
-                Console.WriteLine("load " + filename + ".xlsx");
-                using (var stream = new System.IO.FileStream(filename + ".xlsx",
+                Console.WriteLine("load " + excelPath);
+                using (var stream = new System.IO.FileStream(excelPath,
                     System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite))
                 {
                     var workbook = WorkbookFactory.Create(stream);
-                    Console.WriteLine("loaded " + filename + ".xlsx");
+                    Console.WriteLine("loaded " + excelPath);
                     var worksheet = workbook.GetSheetAt(0);
                     {
                         var row = worksheet.GetRow(0);
@@ -62,8 +63,8 @@ namespace ExcelToJsonC
                         }
                     }
                     var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(keyLanguageValues, Newtonsoft.Json.Formatting.Indented);
-                    Console.WriteLine("write " + filename + ".json");
-                    System.IO.File.WriteAllText("mst_develop_localize_Data/StreamingAssets/" + filename + ".json", jsonString);
+                    Console.WriteLine("write " + jsonPath);
+                    System.IO.File.WriteAllText(jsonPath, jsonString);
                 }
             }
             Console.WriteLine("finished");
