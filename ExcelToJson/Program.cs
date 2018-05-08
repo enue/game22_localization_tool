@@ -58,12 +58,7 @@ namespace ExcelToJson
                         {
                             var language = it.Value;
                             var cell = row?.GetCell(it.Key);
-                            if (cell == null)
-                            {
-                                continue;
-                            }
-
-                            var value = cell.StringCellValue;
+                            var value = cell?.StringCellValue;
 
                             Dictionary<string, string> dict;
                             if (!keyLanguageValues.TryGetValue(key, out dict))
