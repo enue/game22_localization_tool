@@ -10,11 +10,11 @@ batファイルから起動する。
 ファイル名はプロジェクトごとにかわるので、ユーザーが適宜編集すること。  
 
 ```dos
-"jsonToExcel.exe" jsonファイル名1 xlsxファイル名1 jsonファイル名2 xlsxファイル名2...
+"jsonToExcel.exe" jsonファイル名 xlsxファイル名
 ```
 
 ```dos
-"jsonToExcel.exe" reverse jsonファイル名1 xlsxファイル名1 jsonファイル名2 xlsxファイル名2...
+"jsonToExcel.exe" reverse jsonファイル名 xlsxファイル名ル名
 ```
 
 # jsonサンプル
