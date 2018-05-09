@@ -1,11 +1,13 @@
-"ExcelToJson.exe" reverse ^
-Localization.xlsx mst_develop_localize_Data/StreamingAssets/Localization.json ^
-LocalizationAbility.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationAbility.json ^
-LocalizationArticle.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationArticle.json ^
-LocalizationBattle.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationBattle.json ^
-LocalizationJob.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationJob.json ^
-LocalizationCharacter.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationCharacter.json ^
-LocalizationUnit.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationUnit.json ^
-LocalizationElement.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationElement.json ^
-LocalizationScript.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationScript.json ^
-LocalizationCredit.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationCredit.json
+@echo off
+"ExcelToJson.exe" reverse Localization.xlsx mst_develop_localize_Data/StreamingAssets/Localization.json
+"ExcelToJson.exe" reverse LocalizationAbility.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationAbility.json
+"ExcelToJson.exe" reverse LocalizationArticle.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationArticle.json
+"ExcelToJson.exe" reverse LocalizationBattle.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationBattle.json
+"ExcelToJson.exe" reverse LocalizationJob.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationJob.json
+"ExcelToJson.exe" reverse LocalizationCharacter.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationCharacter.json
+"ExcelToJson.exe" reverse LocalizationUnit.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationUnit.json
+"ExcelToJson.exe" reverse LocalizationElement.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationElement.json
+"ExcelToJson.exe" reverse LocalizationScript.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationScript.json
+"ExcelToJson.exe" reverse LocalizationCredit.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationCredit.json
+echo finished all
+pause >nul
