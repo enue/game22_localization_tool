@@ -5,7 +5,16 @@ VisualStudioVersion = 15.0.27428.2043
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelToJson", "ExcelToJson\ExcelToJson.csproj", "{4D4AE139-2592-4E7D-AC9B-0AFEA511F65B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelToCS", "ExcelToCS\ExcelToCS.csproj", "{B29C6229-9E7C-4E0E-8C31-E077E77A2D2E}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "TSKT", "TSKT\TSKT.shproj", "{4EA6FEDB-D8C8-41B7-A33A-89662F36B59C}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		TSKT\TSKT.projitems*{4d4ae139-2592-4e7d-ac9b-0afea511f65b}*SharedItemsImports = 4
+		TSKT\TSKT.projitems*{4ea6fedb-d8c8-41b7-a33a-89662f36b59c}*SharedItemsImports = 13
+		TSKT\TSKT.projitems*{b29c6229-9e7c-4e0e-8c31-e077e77a2d2e}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -15,6 +24,10 @@ Global
 		{4D4AE139-2592-4E7D-AC9B-0AFEA511F65B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D4AE139-2592-4E7D-AC9B-0AFEA511F65B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D4AE139-2592-4E7D-AC9B-0AFEA511F65B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B29C6229-9E7C-4E0E-8C31-E077E77A2D2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B29C6229-9E7C-4E0E-8C31-E077E77A2D2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B29C6229-9E7C-4E0E-8C31-E077E77A2D2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B29C6229-9E7C-4E0E-8C31-E077E77A2D2E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
