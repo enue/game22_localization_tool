@@ -32,7 +32,11 @@ namespace TSKT
                 for (int i = 1; i <= lastRow; i++)
                 {
                     var row = worksheet.GetRow(i);
-                    var key = row.GetCell(0).StringCellValue;
+                    var key = row?.GetCell(0)?.StringCellValue;
+                    if (key == null)
+                    {
+                        continue;
+                    }
                     foreach (var it in columnLanguages)
                     {
                         var language = it.Value;
