@@ -13,14 +13,14 @@ namespace ExcelToCS
         {
             if (args.Length == 0)
             {
-                Console.WriteLine("args -file filename -output outputFilename -ignore ignoreColumn");
+                Console.WriteLine("args -file filename -output outputFilename -ignore ignoreColumn -namespace namespace");
                 Console.ReadKey();
                 return;
             }
             string excelPath = null;
             string outputPath = null;
             string ignoreColumn = null;
-
+            string _namespace = "TSKT";
             for (int i = 0; i < args.Length / 2; ++i)
             {
                 var key = args[i * 2];
@@ -37,8 +37,12 @@ namespace ExcelToCS
                 {
                     ignoreColumn = value;
                 }
+                else if (key == "-namespace")
+                {
+                    _namespace = value;
+                }
             }
-            var codeString = GenerateCode(excelPath, ignoreColumn);
+            var codeString = GenerateCode(excelPath, ignoreColumn, _namespace);
 
             Console.WriteLine("write " + outputPath);
             System.IO.File.WriteAllText(outputPath, codeString);
@@ -46,7 +50,7 @@ namespace ExcelToCS
             Console.ReadKey();
         }
 
-        static string GenerateCode(string excelPath, string ignoreColumn)
+        static string GenerateCode(string excelPath, string ignoreColumn, string _namespace)
         {
             var keyLanguageValues = TSKT.Library.CreateDictionaryFromExcel(excelPath);
 
@@ -70,7 +74,7 @@ namespace ExcelToCS
 
             var builder = new StringBuilder();
             builder.AppendLine("using System.Collections.Generic;");
-            builder.AppendLine("namespace TSKT");
+            builder.AppendLine("namespace " + _namespace);
             builder.AppendLine("{");
             builder.AppendLine("    public static class Generated");
             builder.AppendLine("    {");
