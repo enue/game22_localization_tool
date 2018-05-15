@@ -11,16 +11,42 @@ namespace ExcelToCS
     {
         static void Main(string[] args)
         {
-            var excelPath = args[0];
-            var outputPath = args[1];
-            var codeString = GenerateCode(excelPath);
+            if (args.Length == 0)
+            {
+                Console.WriteLine("args -file filename -output outputFilename -ignore ignoreColumn");
+                Console.ReadKey();
+                return;
+            }
+            string excelPath = null;
+            string outputPath = null;
+            string ignoreColumn = null;
+
+            for (int i = 0; i < args.Length / 2; ++i)
+            {
+                var key = args[i * 2];
+                var value = args[i * 2 + 1];
+                if (key == "-output")
+                {
+                    outputPath = value;
+                }
+                else if (key == "-file")
+                {
+                    excelPath = value;
+                }
+                else if (key == "-ignore")
+                {
+                    ignoreColumn = value;
+                }
+            }
+            var codeString = GenerateCode(excelPath, ignoreColumn);
 
             Console.WriteLine("write " + outputPath);
             System.IO.File.WriteAllText(outputPath, codeString);
             Console.WriteLine("finished");
+            Console.ReadKey();
         }
 
-        static string GenerateCode(string excelPath)
+        static string GenerateCode(string excelPath, string ignoreColumn)
         {
             var keyLanguageValues = TSKT.Library.CreateDictionaryFromExcel(excelPath);
 
@@ -54,6 +80,10 @@ namespace ExcelToCS
             foreach(var languageKeyValue in languageKeyValues)
             {
                 var language = languageKeyValue.Key;
+                if (language == ignoreColumn)
+                {
+                    continue;
+                }
                 builder.AppendLine("            {");
                 builder.AppendLine("                \"" + language + "\",");
                 builder.AppendLine("                new Dictionary<string, string>()");
