@@ -1,13 +1,13 @@
 @echo off
-"ExcelToJson.exe" reverse Localization.xlsx mst_develop_localize_Data/StreamingAssets/Localization.json
-"ExcelToJson.exe" reverse LocalizationAbility.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationAbility.json
-"ExcelToJson.exe" reverse LocalizationArticle.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationArticle.json
-"ExcelToJson.exe" reverse LocalizationBattle.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationBattle.json
-"ExcelToJson.exe" reverse LocalizationJob.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationJob.json
-"ExcelToJson.exe" reverse LocalizationCharacter.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationCharacter.json
-"ExcelToJson.exe" reverse LocalizationUnit.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationUnit.json
-"ExcelToJson.exe" reverse LocalizationElement.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationElement.json
-"ExcelToJson.exe" reverse LocalizationScript.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationScript.json
-"ExcelToJson.exe" reverse LocalizationCredit.xlsx mst_develop_localize_Data/StreamingAssets/LocalizationCredit.json
+"ExcelToJson.exe" out Localization.xlsx in mst_Data/StreamingAssets/Localization.json
+"ExcelToJson.exe" out LocalizationAbility.xlsx in mst_Data/StreamingAssets/LocalizationAbility.json
+"ExcelToJson.exe" out LocalizationArticle.xlsx in mst_Data/StreamingAssets/LocalizationArticle.json
+"ExcelToJson.exe" out LocalizationBattle.xlsx in mst_Data/StreamingAssets/LocalizationBattle.json
+"ExcelToJson.exe" out LocalizationJob.xlsx in mst_Data/StreamingAssets/LocalizationJob.json
+"ExcelToJson.exe" out LocalizationCharacter.xlsx in mst_Data/StreamingAssets/LocalizationCharacter.json
+"ExcelToJson.exe" out LocalizationUnit.xlsx in mst_Data/StreamingAssets/LocalizationUnit.json
+"ExcelToJson.exe" out LocalizationElement.xlsx in mst_Data/StreamingAssets/LocalizationElement.json
+"ExcelToJson.exe" out LocalizationScript.xlsx in mst_Data/StreamingAssets/LocalizationScript.json
+"ExcelToJson.exe" out LocalizationCredit.xlsx in mst_Data/StreamingAssets/LocalizationCredit.json
 echo finished all
 pause >nul

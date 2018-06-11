@@ -11,29 +11,75 @@ namespace ExcelToJson
     {
         static void Main(string[] args)
         {
-            if (args.Length == 3 && args[0] == "reverse")
+            string outputFile = null;
+            var inputFiles = new List<string>();
+            for (int i = 0; i < args.Length; ++i)
             {
-                JsonToExcel(args[2], args[1]);
+                if (args[i] == "in")
+                {
+                    inputFiles.Add(args[i + 1]);
+                    ++i;
+                }
+                else if (args[i] == "out")
+                {
+                    outputFile = args[i + 1];
+                    ++i;
+                }
             }
-            else if (args.Length == 2)
+
+            var outputExtension = System.IO.Path.GetExtension(outputFile);
+            if (outputExtension == "xlsx")
             {
-                ExcelToJson(args[0], args[1]);
+                JsonsToExcel(inputFiles.ToArray(), outputFile);
+            }
+            else
+            {
+                ExcelsToJson(inputFiles.ToArray(), outputFile);
             }
         }
 
-        static void ExcelToJson(string excelPath, string jsonPath)
+        static void ExcelsToJson(string[] excelPaths, string jsonPath)
         {
-            var keyLanguageValues = TSKT.Library.CreateDictionaryFromExcel(excelPath);
-            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(keyLanguageValues, Newtonsoft.Json.Formatting.Indented);
+            var keyLanguageValues = excelPaths.Select(_ => TSKT.Library.CreateDictionaryFromExcel(_)).ToArray();
+            var json = MergeDictionary(keyLanguageValues);
+
+            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(json, Newtonsoft.Json.Formatting.Indented);
             Console.WriteLine("write " + jsonPath);
             System.IO.File.WriteAllText(jsonPath, jsonString);
             Console.WriteLine("finished");
         }
 
-        static void JsonToExcel(string jsonPath, string excelPath)
+        static void JsonsToExcel(string[] jsonPaths, string excelPath)
         {
-            Console.WriteLine("load " + jsonPath);
-            var jsonString = System.IO.File.ReadAllText(jsonPath);
+            var jsons = new List<Dictionary<string, Dictionary<string, string>>>();
+            foreach (var jsonPath in jsonPaths)
+            {
+                var keyLanguageValues = new Dictionary<string, Dictionary<string, string>>();
+                jsons.Add(keyLanguageValues);
+
+                Console.WriteLine("load " + jsonPath);
+                var jsonString = System.IO.File.ReadAllText(jsonPath);
+                var json = Newtonsoft.Json.JsonConvert.DeserializeObject<Newtonsoft.Json.Linq.JObject>(jsonString);
+                foreach (var it in json)
+                {
+                    var key = it.Key;
+
+                    foreach (var pair in (Newtonsoft.Json.Linq.JObject)it.Value)
+                    {
+                        var language = pair.Key;
+                        var value = (string)pair.Value;
+
+                        Dictionary<string, string> languageValueMap;
+                        if (!keyLanguageValues.TryGetValue(key, out languageValueMap))
+                        {
+                            languageValueMap = new Dictionary<string, string>();
+                            keyLanguageValues.Add(key, languageValueMap);
+                        }
+                        languageValueMap.Add(language, value);
+                    }
+                }
+            }
+            var mergedJson = MergeDictionary(jsons.ToArray());
 
             var book = new NPOI.XSSF.UserModel.XSSFWorkbook();
             var sheet = book.CreateSheet("sheet");
@@ -41,18 +87,17 @@ namespace ExcelToJson
 
             var columns = new Dictionary<string, int>();
 
-            var json = Newtonsoft.Json.JsonConvert.DeserializeObject<Newtonsoft.Json.Linq.JObject>(jsonString);
-            foreach (var it in json)
+            foreach (var keyLanguageValue in mergedJson)
             {
-                var key = it.Key;
+                var key = keyLanguageValue.Key;
 
                 var row = sheet.CreateRow(sheet.LastRowNum + 1);
                 row.CreateCell(0).SetCellValue(key);
 
-                foreach (var pair in (Newtonsoft.Json.Linq.JObject)it.Value)
+                foreach (var pair in keyLanguageValue.Value)
                 {
                     var language = pair.Key;
-                    var value = (string)pair.Value;
+                    var value = pair.Value;
                     int column;
                     if (!columns.TryGetValue(language, out column))
                     {
@@ -76,6 +121,40 @@ namespace ExcelToJson
                 book.Write(fs);
             }
             Console.WriteLine("finished");
+        }
+
+        static Dictionary<string, Dictionary<string, string>> MergeDictionary(params Dictionary<string, Dictionary<string, string>>[] dictionaries)
+        {
+            var merged = new Dictionary<string, Dictionary<string, string>>();
+            foreach(var dictionary in dictionaries)
+            {
+                foreach (var it in dictionary)
+                {
+                    Dictionary<string, string> dict;
+                    if (!merged.TryGetValue(it.Key, out dict))
+                    {
+                        dict = new Dictionary<string, string>(it.Value);
+                        merged.Add(it.Key, dict);
+                    }
+                    else
+                    {
+                        foreach (var pair in it.Value)
+                        {
+                            string oldValue;
+                            dict.TryGetValue(pair.Key, out oldValue);
+                            if (string.IsNullOrEmpty(oldValue))
+                            {
+                                dict[pair.Key] = pair.Value;
+                            }
+                            else if (oldValue != pair.Value && !string.IsNullOrEmpty(pair.Value))
+                            {
+                                Console.WriteLine("conflict : " + it.Key + ", " + pair.Key + ", [" + oldValue + " and " + pair.Value + "]");
+                            }
+                        }
+                    }
+                }
+            }
+            return merged;
         }
     }
 }
