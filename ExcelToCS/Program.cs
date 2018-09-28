@@ -62,8 +62,7 @@ namespace ExcelToCS
                 {
                     var language = languageValue.Key;
                     var value = languageValue.Value;
-                    Dictionary<string, string> dict;
-                    if (!languageKeyValues.TryGetValue(language, out dict))
+                    if (!languageKeyValues.TryGetValue(language, out Dictionary<string, string> dict))
                     {
                         dict = new Dictionary<string, string>();
                         languageKeyValues.Add(language, dict);

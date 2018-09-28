@@ -69,8 +69,7 @@ namespace ExcelToJson
                         var language = pair.Key;
                         var value = (string)pair.Value;
 
-                        Dictionary<string, string> languageValueMap;
-                        if (!keyLanguageValues.TryGetValue(key, out languageValueMap))
+                        if (!keyLanguageValues.TryGetValue(key, out Dictionary<string, string> languageValueMap))
                         {
                             languageValueMap = new Dictionary<string, string>();
                             keyLanguageValues.Add(key, languageValueMap);
@@ -98,8 +97,7 @@ namespace ExcelToJson
                 {
                     var language = pair.Key;
                     var value = pair.Value;
-                    int column;
-                    if (!columns.TryGetValue(language, out column))
+                    if (!columns.TryGetValue(language, out int column))
                     {
                         column = columns.Count + 1;
                         columns.Add(language, column);
@@ -130,8 +128,7 @@ namespace ExcelToJson
             {
                 foreach (var it in dictionary)
                 {
-                    Dictionary<string, string> dict;
-                    if (!merged.TryGetValue(it.Key, out dict))
+                    if (!merged.TryGetValue(it.Key, out Dictionary<string, string> dict))
                     {
                         dict = new Dictionary<string, string>(it.Value);
                         merged.Add(it.Key, dict);
@@ -140,8 +137,7 @@ namespace ExcelToJson
                     {
                         foreach (var pair in it.Value)
                         {
-                            string oldValue;
-                            dict.TryGetValue(pair.Key, out oldValue);
+                            dict.TryGetValue(pair.Key, out string oldValue);
                             if (string.IsNullOrEmpty(oldValue))
                             {
                                 dict[pair.Key] = pair.Value;

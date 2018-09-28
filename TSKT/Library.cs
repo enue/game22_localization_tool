@@ -43,8 +43,7 @@ namespace TSKT
                         var cell = row?.GetCell(it.Key);
                         var value = cell?.ToString();
 
-                        Dictionary<string, string> dict;
-                        if (!keyLanguageValues.TryGetValue(key, out dict))
+                        if (!keyLanguageValues.TryGetValue(key, out Dictionary<string, string> dict))
                         {
                             dict = new Dictionary<string, string>();
                             keyLanguageValues.Add(key, dict);
