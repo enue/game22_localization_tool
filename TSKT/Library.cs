@@ -1,7 +1,8 @@
-﻿using NPOI.SS.UserModel;
+﻿using ClosedXML.Excel;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace TSKT
 {
@@ -14,40 +15,39 @@ namespace TSKT
             using (var stream = new System.IO.FileStream(excelPath,
                 System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite))
             {
-                var workbook = WorkbookFactory.Create(stream);
+                var workbook = new XLWorkbook(stream);
                 Console.WriteLine("loaded " + excelPath);
-                var worksheet = workbook.GetSheetAt(0);
+                var worksheet = workbook.Worksheet(1);
                 {
-                    var row = worksheet.GetRow(0);
-                    var cells = row.Cells;
-                    for (int i = 1; i < cells.Count; ++i)
+                    var row = worksheet.Rows().First();
+                    foreach(var cell in row.CellsUsed().Skip(1))
                     {
-                        var value = cells[i].StringCellValue;
-                        columnLanguages.Add(i, value);
+                        columnLanguages.Add(
+                            cell.WorksheetColumn().ColumnNumber(),
+                            cell.Value.ToString());
                     }
                 }
 
                 var keyLanguageValues = new Dictionary<string, Dictionary<string, string>>();
-                int lastRow = worksheet.LastRowNum;
-                for (int i = 1; i <= lastRow; i++)
+                foreach(var row in worksheet.RowsUsed().Skip(1))
                 {
-                    var row = worksheet.GetRow(i);
-                    var key = row?.GetCell(0)?.StringCellValue;
+                    var key = row?.Cells().First()?.Value.ToString();
                     if (key == null)
                     {
                         continue;
                     }
+
+                    if (!keyLanguageValues.TryGetValue(key, out Dictionary<string, string> dict))
+                    {
+                        dict = new Dictionary<string, string>();
+                        keyLanguageValues.Add(key, dict);
+                    }
+
                     foreach (var it in columnLanguages)
                     {
                         var language = it.Value;
-                        var cell = row?.GetCell(it.Key);
-                        var value = cell?.ToString();
-
-                        if (!keyLanguageValues.TryGetValue(key, out Dictionary<string, string> dict))
-                        {
-                            dict = new Dictionary<string, string>();
-                            keyLanguageValues.Add(key, dict);
-                        }
+                        var cell = row?.Cell(it.Key);
+                        var value = cell?.Value?.ToString();
                         dict.Add(language, value);
                     }
                 }
