@@ -1,4 +1,4 @@
-﻿using NPOI.SS.UserModel;
+﻿using ClosedXML.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +28,7 @@ namespace ExcelToJson
             }
 
             var outputExtension = System.IO.Path.GetExtension(outputFile);
-            if (outputExtension == "xlsx")
+            if (outputExtension == ".xlsx")
             {
                 JsonsToExcel(inputFiles.ToArray(), outputFile);
             }
@@ -80,43 +80,54 @@ namespace ExcelToJson
             }
             var mergedJson = MergeDictionary(jsons.ToArray());
 
-            var book = new NPOI.XSSF.UserModel.XSSFWorkbook();
-            var sheet = book.CreateSheet("sheet");
-            sheet.CreateFreezePane(0, 1, 0, 1);
+            var book = new XLWorkbook();
+            var sheet = book.Worksheets.Add("sheet");
+            sheet.SheetView.Freeze(1, 1);
 
-            var columns = new Dictionary<string, int>();
+            var columns = new List<string>();
 
-            foreach (var keyLanguageValue in mergedJson)
             {
-                var key = keyLanguageValue.Key;
-
-                var row = sheet.CreateRow(sheet.LastRowNum + 1);
-                row.CreateCell(0).SetCellValue(key);
-
-                foreach (var pair in keyLanguageValue.Value)
+                var index = 2;
+                foreach (var keyLanguageValue in mergedJson)
                 {
-                    var language = pair.Key;
-                    var value = pair.Value;
-                    if (!columns.TryGetValue(language, out int column))
+                    var key = keyLanguageValue.Key;
+
+                    var row = sheet.Row(index);
+                    row.Cell(1).Value = key;
+
+                    foreach (var pair in keyLanguageValue.Value)
                     {
-                        column = columns.Count + 1;
-                        columns.Add(language, column);
+                        var language = pair.Key;
+                        var value = pair.Value;
+
+                        var column = columns.IndexOf(language);
+                        if (column < 0)
+                        {
+                            column = columns.Count;
+                            columns.Add(language);
+                        }
+
+                        row.Cell(column + 2).Value = value;
                     }
-                    row.CreateCell(column).SetCellValue(value);
+                    ++index;
                 }
             }
             {
-                var header = sheet.CreateRow(0);
-                header.CreateCell(0).SetCellValue("key");
+                var header = sheet.Row(1);
+                header.Cell(1).Value = "key";
+                var index = 2;
                 foreach (var it in columns)
                 {
-                    header.CreateCell(it.Value).SetCellValue(it.Key);
+                    header.Cell(index).Value = it;
+                    ++index;
                 }
             }
+
+
             Console.WriteLine("save " + excelPath);
             using (var fs = new System.IO.FileStream(excelPath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
             {
-                book.Write(fs);
+                book.SaveAs(fs);
             }
             Console.WriteLine("finished");
         }
