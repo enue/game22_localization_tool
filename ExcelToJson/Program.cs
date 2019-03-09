@@ -41,11 +41,12 @@ namespace ExcelToJson
         static void ExcelsToJson(string[] excelPaths, string jsonPath)
         {
             var keyLanguageValues = excelPaths.Select(_ => TSKT.Library.CreateDictionaryFromExcel(_)).ToArray();
-            var json = MergeDictionary(keyLanguageValues);
+            var dict = MergeDictionary(keyLanguageValues);
+            var json = Utf8Json.JsonSerializer.Serialize(dict);
 
-            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(json, Newtonsoft.Json.Formatting.Indented);
+            var prettyJson = Utf8Json.JsonSerializer.PrettyPrintByteArray(json);
             Console.WriteLine("write " + jsonPath);
-            System.IO.File.WriteAllText(jsonPath, jsonString);
+            System.IO.File.WriteAllBytes(jsonPath, prettyJson);
             Console.WriteLine("finished");
         }
 
@@ -59,12 +60,12 @@ namespace ExcelToJson
 
                 Console.WriteLine("load " + jsonPath);
                 var jsonString = System.IO.File.ReadAllText(jsonPath);
-                var json = Newtonsoft.Json.JsonConvert.DeserializeObject<Newtonsoft.Json.Linq.JObject>(jsonString);
+                var json = Utf8Json.JsonSerializer.Deserialize<Dictionary<string, object>>(jsonString);
                 foreach (var it in json)
                 {
                     var key = it.Key;
 
-                    foreach (var pair in (Newtonsoft.Json.Linq.JObject)it.Value)
+                    foreach (var pair in (Dictionary<string, object>)it.Value)
                     {
                         var language = pair.Key;
                         var value = (string)pair.Value;
