@@ -6,9 +6,75 @@ using System.Linq;
 
 namespace TSKT
 {
+    public class Sheet
+    {
+        public class Item
+        {
+            public class Pair
+            {
+                public string language;
+                public string text;
+            }
+
+            public string key;
+            public List<Pair> pairs = new List<Pair>();
+        }
+
+        public List<Item> items = new List<Item>();
+
+        public void Merge(Sheet source)
+        {
+            foreach(var sourceItem in source.items)
+            {
+                var item = items.FirstOrDefault(_ => _.key == sourceItem.key);
+                if (item == null)
+                {
+                    item = new Item();
+                    item.key = sourceItem.key;
+                    items.Add(item);
+                }
+
+                foreach (var sourcePair in sourceItem.pairs)
+                {
+                    var pair = item.pairs.FirstOrDefault(_ => _.language == sourcePair.language);
+                    if (pair == null)
+                    {
+                        pair = new Item.Pair();
+                        pair.language = sourcePair.language;
+                        item.pairs.Add(pair);
+                    }
+                    else
+                    {
+                        Console.WriteLine("conflict : " + sourceItem.key + ", " + sourcePair.language + ", [" + pair.text + " and " + sourcePair.text + "]");
+                    }
+                    pair.text = sourcePair.text;
+                }
+            }
+        }
+        public Dictionary<string, Dictionary<string, string>> CreateLanguageKeyTextDictionary()
+        {
+            var languageKeyValues = new Dictionary<string, Dictionary<string, string>>();
+            foreach (var item in items)
+            {
+                foreach (var languageValue in item.pairs)
+                {
+                    var language = languageValue.language;
+                    var value = languageValue.text;
+                    if (!languageKeyValues.TryGetValue(language, out Dictionary<string, string> dict))
+                    {
+                        dict = new Dictionary<string, string>();
+                        languageKeyValues.Add(language, dict);
+                    }
+                    dict.Add(item.key, value);
+                }
+            }
+            return languageKeyValues;
+        }
+    }
+
     public class Library
     {
-        public static Dictionary<string, Dictionary<string, string>> CreateDictionaryFromExcel(string excelPath)
+        public static Sheet CreateSheetFromExcel(string excelPath)
         {
             var columnLanguages = new Dictionary<int, string>();
             Console.WriteLine("load " + excelPath);
@@ -28,7 +94,7 @@ namespace TSKT
                     }
                 }
 
-                var keyLanguageValues = new Dictionary<string, Dictionary<string, string>>();
+                var result = new Sheet();
                 foreach(var row in worksheet.RowsUsed().Skip(1))
                 {
                     var key = row?.Cells().First()?.Value.ToString();
@@ -37,21 +103,25 @@ namespace TSKT
                         continue;
                     }
 
-                    if (!keyLanguageValues.TryGetValue(key, out Dictionary<string, string> dict))
-                    {
-                        dict = new Dictionary<string, string>();
-                        keyLanguageValues.Add(key, dict);
-                    }
+                    var item = new Sheet.Item();
+                    result.items.Add(item);
+                    item.key = key;
 
                     foreach (var it in columnLanguages)
                     {
                         var language = it.Value;
                         var cell = row?.Cell(it.Key);
                         var value = cell?.Value?.ToString();
-                        dict.Add(language, value);
+
+                        item.pairs.Add(new Sheet.Item.Pair()
+                        {
+                            language = language,
+                            text = value,
+                        });
                     }
                 }
-                return keyLanguageValues;
+
+                return result;
             }
         }
     }

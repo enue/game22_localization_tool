@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TSKT;
 
 namespace ExcelToJson
 {
@@ -40,10 +41,13 @@ namespace ExcelToJson
 
         static void ExcelsToJson(string[] excelPaths, string jsonPath)
         {
-            var keyLanguageValues = excelPaths.Select(_ => TSKT.Library.CreateDictionaryFromExcel(_)).ToArray();
-            var dict = MergeDictionary(keyLanguageValues);
-            var json = Utf8Json.JsonSerializer.Serialize(dict);
-
+            var mergedSheet = new Sheet();
+            var sheets = excelPaths.Select(_ => Library.CreateSheetFromExcel(_));
+            foreach(var sheet in sheets)
+            {
+                mergedSheet.Merge(sheet);
+            }
+            var json = Utf8Json.JsonSerializer.Serialize(mergedSheet);
             var prettyJson = Utf8Json.JsonSerializer.PrettyPrintByteArray(json);
             Console.WriteLine("write " + jsonPath);
             System.IO.File.WriteAllBytes(jsonPath, prettyJson);
@@ -52,54 +56,34 @@ namespace ExcelToJson
 
         static void JsonsToExcel(string[] jsonPaths, string excelPath)
         {
-            var jsons = new List<Dictionary<string, Dictionary<string, string>>>();
+            var mergedSheet = new Sheet();
             foreach (var jsonPath in jsonPaths)
             {
-                var keyLanguageValues = new Dictionary<string, Dictionary<string, string>>();
-                jsons.Add(keyLanguageValues);
-
                 Console.WriteLine("load " + jsonPath);
-                var jsonString = System.IO.File.ReadAllText(jsonPath);
-                var json = Utf8Json.JsonSerializer.Deserialize<Dictionary<string, object>>(jsonString);
-                foreach (var it in json)
-                {
-                    var key = it.Key;
-
-                    foreach (var pair in (Dictionary<string, object>)it.Value)
-                    {
-                        var language = pair.Key;
-                        var value = (string)pair.Value;
-
-                        if (!keyLanguageValues.TryGetValue(key, out Dictionary<string, string> languageValueMap))
-                        {
-                            languageValueMap = new Dictionary<string, string>();
-                            keyLanguageValues.Add(key, languageValueMap);
-                        }
-                        languageValueMap.Add(language, value);
-                    }
-                }
+                var json = System.IO.File.ReadAllBytes(jsonPath);
+                var sheet = Utf8Json.JsonSerializer.Deserialize<Sheet>(json);
+                mergedSheet.Merge(sheet);
             }
-            var mergedJson = MergeDictionary(jsons.ToArray());
 
             var book = new XLWorkbook();
-            var sheet = book.Worksheets.Add("sheet");
-            sheet.SheetView.Freeze(1, 1);
+            var excelSheet = book.Worksheets.Add("sheet");
+            excelSheet.SheetView.Freeze(1, 1);
 
             var columns = new List<string>();
 
             {
                 var index = 2;
-                foreach (var keyLanguageValue in mergedJson)
+                foreach (var item in mergedSheet.items)
                 {
-                    var key = keyLanguageValue.Key;
+                    var key = item.key;
 
-                    var row = sheet.Row(index);
+                    var row = excelSheet.Row(index);
                     row.Cell(1).Value = key;
 
-                    foreach (var pair in keyLanguageValue.Value)
+                    foreach (var pair in item.pairs)
                     {
-                        var language = pair.Key;
-                        var value = pair.Value;
+                        var language = pair.language;
+                        var value = pair.text;
 
                         var column = columns.IndexOf(language);
                         if (column < 0)
@@ -114,7 +98,7 @@ namespace ExcelToJson
                 }
             }
             {
-                var header = sheet.Row(1);
+                var header = excelSheet.Row(1);
                 header.Cell(1).Value = "key";
                 var index = 2;
                 foreach (var it in columns)
@@ -131,38 +115,6 @@ namespace ExcelToJson
                 book.SaveAs(fs);
             }
             Console.WriteLine("finished");
-        }
-
-        static Dictionary<string, Dictionary<string, string>> MergeDictionary(params Dictionary<string, Dictionary<string, string>>[] dictionaries)
-        {
-            var merged = new Dictionary<string, Dictionary<string, string>>();
-            foreach(var dictionary in dictionaries)
-            {
-                foreach (var it in dictionary)
-                {
-                    if (!merged.TryGetValue(it.Key, out Dictionary<string, string> dict))
-                    {
-                        dict = new Dictionary<string, string>(it.Value);
-                        merged.Add(it.Key, dict);
-                    }
-                    else
-                    {
-                        foreach (var pair in it.Value)
-                        {
-                            dict.TryGetValue(pair.Key, out string oldValue);
-                            if (string.IsNullOrEmpty(oldValue))
-                            {
-                                dict[pair.Key] = pair.Value;
-                            }
-                            else if (oldValue != pair.Value && !string.IsNullOrEmpty(pair.Value))
-                            {
-                                Console.WriteLine("conflict : " + it.Key + ", " + pair.Key + ", [" + oldValue + " and " + pair.Value + "]");
-                            }
-                        }
-                    }
-                }
-            }
-            return merged;
         }
     }
 }

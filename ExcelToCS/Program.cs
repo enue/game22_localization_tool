@@ -51,24 +51,9 @@ namespace ExcelToCS
 
         static string GenerateCode(string excelPath, string ignoreColumn, string _namespace)
         {
-            var keyLanguageValues = TSKT.Library.CreateDictionaryFromExcel(excelPath);
+            var sheet = TSKT.Library.CreateSheetFromExcel(excelPath);
 
-            var languageKeyValues = new Dictionary<string, Dictionary<string, string>>();
-            foreach(var it in keyLanguageValues)
-            {
-                var key = it.Key;
-                foreach(var languageValue in it.Value)
-                {
-                    var language = languageValue.Key;
-                    var value = languageValue.Value;
-                    if (!languageKeyValues.TryGetValue(language, out Dictionary<string, string> dict))
-                    {
-                        dict = new Dictionary<string, string>();
-                        languageKeyValues.Add(language, dict);
-                    }
-                    dict.Add(key, value);
-                }
-            }
+            var languageKeyValues = sheet.CreateLanguageKeyTextDictionary();
 
             var builder = new StringBuilder();
             builder.AppendLine("using System.Collections.Generic;");
