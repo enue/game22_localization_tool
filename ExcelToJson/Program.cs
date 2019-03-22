@@ -1,9 +1,11 @@
 ﻿using ClosedXML.Excel;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using TSKT;
 
 namespace ExcelToJson
@@ -33,6 +35,10 @@ namespace ExcelToJson
             {
                 JsonsToExcel(inputFiles.ToArray(), outputFile);
             }
+            else if (outputExtension == ".xml")
+            {
+                ExcelsToXml(inputFiles.ToArray(), outputFile);
+            }
             else
             {
                 ExcelsToJson(inputFiles.ToArray(), outputFile);
@@ -51,6 +57,28 @@ namespace ExcelToJson
             var prettyJson = Utf8Json.JsonSerializer.PrettyPrintByteArray(json);
             Console.WriteLine("write " + jsonPath);
             System.IO.File.WriteAllBytes(jsonPath, prettyJson);
+            Console.WriteLine("finished");
+        }
+
+        static void ExcelsToXml(string[] excelPaths, string xmlPath)
+        {
+            var mergedSheet = new Sheet();
+            var sheets = excelPaths.Select(_ => Library.CreateSheetFromExcel(_));
+            foreach (var sheet in sheets)
+            {
+                mergedSheet.Merge(sheet);
+            }
+            var serializer = new XmlSerializer(typeof(Sheet));
+
+            var sb = new StringBuilder();
+            using (var writer = new System.IO.StringWriter(sb))
+            {
+                serializer.Serialize(writer, mergedSheet);
+            };
+            var xmlString = sb.ToString();
+
+            Console.WriteLine("write " + xmlPath);
+            File.WriteAllText(xmlPath, xmlString);
             Console.WriteLine("finished");
         }
 
