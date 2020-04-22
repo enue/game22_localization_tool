@@ -24,7 +24,7 @@ namespace TSKT
 
         public void Merge(Sheet source)
         {
-            foreach(var sourceItem in source.items)
+            foreach (var sourceItem in source.items)
             {
                 var item = items.FirstOrDefault(_ => _.key == sourceItem.key);
                 if (item == null)
@@ -70,11 +70,8 @@ namespace TSKT
             }
             return languageKeyValues;
         }
-    }
 
-    public class Library
-    {
-        public static Sheet CreateSheetFromExcel(string excelPath)
+        public static Sheet CreateFromExcel(string excelPath)
         {
             var columnLanguages = new Dictionary<int, string>();
             Console.WriteLine("load " + excelPath);
@@ -86,7 +83,7 @@ namespace TSKT
                 var worksheet = workbook.Worksheet(1);
                 {
                     var row = worksheet.Rows().First();
-                    foreach(var cell in row.CellsUsed().Skip(1))
+                    foreach (var cell in row.CellsUsed().Skip(1))
                     {
                         columnLanguages.Add(
                             cell.WorksheetColumn().ColumnNumber(),
@@ -95,7 +92,7 @@ namespace TSKT
                 }
 
                 var result = new Sheet();
-                foreach(var row in worksheet.RowsUsed().Skip(1))
+                foreach (var row in worksheet.RowsUsed().Skip(1))
                 {
                     var key = row?.Cells().First()?.Value.ToString();
                     if (key == null)
@@ -103,7 +100,7 @@ namespace TSKT
                         continue;
                     }
 
-                    var item = new Sheet.Item();
+                    var item = new Item();
                     result.items.Add(item);
                     item.key = key;
 
@@ -113,7 +110,7 @@ namespace TSKT
                         var cell = row?.Cell(it.Key);
                         var value = cell?.Value?.ToString();
 
-                        item.pairs.Add(new Sheet.Item.Pair()
+                        item.pairs.Add(new Item.Pair()
                         {
                             language = language,
                             text = value,

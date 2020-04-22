@@ -1,14 +1,12 @@
-﻿using ClosedXML.Excel;
-using System;
+﻿using System;
+using ClosedXML.Excel;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
-using TSKT;
 
-namespace ExcelToJson
+namespace TSKT
 {
     class Program
     {
@@ -30,7 +28,7 @@ namespace ExcelToJson
                 }
             }
 
-            var outputExtension = System.IO.Path.GetExtension(outputFile);
+            var outputExtension = Path.GetExtension(outputFile);
             if (outputExtension == ".xlsx")
             {
                 JsonsToExcel(inputFiles.ToArray(), outputFile);
@@ -48,22 +46,22 @@ namespace ExcelToJson
         static void ExcelsToJson(string[] excelPaths, string jsonPath)
         {
             var mergedSheet = new Sheet();
-            var sheets = excelPaths.Select(_ => Library.CreateSheetFromExcel(_));
-            foreach(var sheet in sheets)
+            var sheets = excelPaths.Select(_ => Sheet.CreateFromExcel(_));
+            foreach (var sheet in sheets)
             {
                 mergedSheet.Merge(sheet);
             }
             var json = Utf8Json.JsonSerializer.Serialize(mergedSheet);
             var prettyJson = Utf8Json.JsonSerializer.PrettyPrintByteArray(json);
             Console.WriteLine("write " + jsonPath);
-            System.IO.File.WriteAllBytes(jsonPath, prettyJson);
+            File.WriteAllBytes(jsonPath, prettyJson);
             Console.WriteLine("finished");
         }
 
         static void ExcelsToXml(string[] excelPaths, string xmlPath)
         {
             var mergedSheet = new Sheet();
-            var sheets = excelPaths.Select(_ => Library.CreateSheetFromExcel(_));
+            var sheets = excelPaths.Select(_ => Sheet.CreateFromExcel(_));
             foreach (var sheet in sheets)
             {
                 mergedSheet.Merge(sheet);
@@ -71,7 +69,7 @@ namespace ExcelToJson
             var serializer = new XmlSerializer(typeof(Sheet));
 
             var sb = new StringBuilder();
-            using (var writer = new System.IO.StringWriter(sb))
+            using (var writer = new StringWriter(sb))
             {
                 serializer.Serialize(writer, mergedSheet);
             };
@@ -88,7 +86,7 @@ namespace ExcelToJson
             foreach (var jsonPath in jsonPaths)
             {
                 Console.WriteLine("load " + jsonPath);
-                var json = System.IO.File.ReadAllBytes(jsonPath);
+                var json = File.ReadAllBytes(jsonPath);
                 var sheet = Utf8Json.JsonSerializer.Deserialize<Sheet>(json);
                 mergedSheet.Merge(sheet);
             }
@@ -138,7 +136,7 @@ namespace ExcelToJson
 
 
             Console.WriteLine("save " + excelPath);
-            using (var fs = new System.IO.FileStream(excelPath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+            using (var fs = new FileStream(excelPath, FileMode.Create, FileAccess.Write))
             {
                 book.SaveAs(fs);
             }
