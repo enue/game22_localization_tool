@@ -1,45 +1,61 @@
-# こんなときに使う
+Excel形式の翻訳データをUnityに使いやすいjson形式に変換するツールです
 
-* 翻訳データをゲームに食わせるにはjson形式が都合がよい
-* でもExcelファイルも使いたい
-* つまり、両方の形式をいっぱつで相互変換したい
-
-# 使い方
-
-batファイルから起動する。  
-ファイル名はプロジェクトごとにかわるので、ユーザーが適宜編集すること。  
+# bat sample
 
 ```dos
-"jsonToExcel.exe" jsonファイル名 xlsxファイル名
+"tool/ExcelToJson.exe" in ./source.xlsx out ./output.json
 ```
 
-```dos
-"jsonToExcel.exe" reverse jsonファイル名 xlsxファイル名ル名
-```
+# source xlsx sample
+|key|Japanese|English|
+|:-:|:-:|:-:|
+|Article_ブロンズソード|ブロンズソード|Bronze Sword|
 
-# jsonサンプル
-`"キー" : {"言語" : "表示文字列"}`という構造。  
-`comment`要素はゲームにインポートするときにでも無視すれば良い。
+# output json sample
 
 ```json
 {
-  "Unit.ウォリアーE1": {
-    "jpn": "ウォリアー",
-    "eng": "Warrior",
-    "comment": "敵として出現するウォリアークラス"
-  },
-  "Unit.ウォリアーE2": {
-    "jpn": "ハイウォリアー",
-    "comment": "敵として出現するウォリアークラス"
-  },
-  "Unit.ウォリアーE3": {
-    "jpn": "ソルジャー",
-    "comment": "敵として出現するウォリアークラス"
-  },
+  "items": [
+    {
+      "key": "Article_ブロンズソード",
+      "pairs": [
+        {
+          "language": "Japanese",
+          "text": "ブロンズソード"
+        },
+        {
+          "language": "English",
+          "text": "Bronze Sword"
+        }
+      ]
+    }
+  ]
 }
 ```
 
-# xlsxサンプル
-　一行目が`key, 言語1, 言語2,...`という構造。
+# unity class sample
 
-![xlsx](https://user-images.githubusercontent.com/6186357/39691102-62be6aa8-5217-11e8-9f0e-ad99071ed8f8.png)
+```cs
+[System.Serializable]
+public class Sheet
+{
+    [System.Serializable]
+    public class Item
+    {
+        [System.Serializable]
+        public class Pair
+        {
+            public string language;
+            public string text;
+        }
+
+        public string key;
+        public List<Pair> pairs = new List<Pair>();
+    }
+
+    public List<Item> items = new List<Item>();
+}
+```
+
+https://github.com/enue/Unity_TSKT_Localization/blob/master/Runtime/Sheet.cs
+
