@@ -10,59 +10,92 @@ namespace TSKT
     {
         public class Item
         {
-            public class Pair
+            public struct Pair
             {
                 public string language;
-                public string text;
+                public string? text;
             }
 
             public string key;
-            public List<Pair> pairs = new List<Pair>();
+            public List<Pair> pairs = new();
         }
 
-        public List<Item> items = new List<Item>();
+        public List<Item> items = new();
 
         public void Merge(Sheet source)
         {
             foreach (var sourceItem in source.items)
             {
-                var item = items.FirstOrDefault(_ => _.key == sourceItem.key);
-                if (item == null)
+                var item = new Item()
                 {
-                    item = new Item();
-                    item.key = sourceItem.key;
-                    items.Add(item);
+                    key = sourceItem.key
+                };
+                items.Add(item);
+                item.pairs.AddRange(sourceItem.pairs);
+            }
+        }
+
+        public Sheet Compact()
+        {
+            var result = new Sheet();
+            foreach (var it in items)
+            {
+                var compactPairs = it.pairs.Where(_ => !string.IsNullOrEmpty(_.text)).ToList();
+                if (compactPairs.Count > 0)
+                {
+                    var resultItem = new Item
+                    {
+                        key = it.key
+                    };
+                    resultItem.pairs.AddRange(compactPairs);
+                    result.items.Add(resultItem);
+                }
+            }
+            return result;
+        }
+
+        public Sheet Distinct()
+        {
+            var result = new Sheet();
+            foreach (var it in items)
+            {
+                var resultItem = result.items.FirstOrDefault(_ => _.key == it.key);
+                if (resultItem == null)
+                {
+                    resultItem = new Item();
+                    result.items.Add(resultItem);
                 }
 
-                foreach (var sourcePair in sourceItem.pairs)
+                foreach (var pair in it.pairs)
                 {
-                    var pair = item.pairs.FirstOrDefault(_ => _.language == sourcePair.language);
-                    if (pair == null)
+                    var index = resultItem.pairs.FindIndex(_ => _.language == pair.language);
+                    if (index < 0)
                     {
-                        pair = new Item.Pair();
-                        pair.language = sourcePair.language;
-                        item.pairs.Add(pair);
+                        resultItem.pairs.Add(pair);
                     }
                     else
                     {
-                        Console.WriteLine("conflict : " + sourceItem.key + ", " + sourcePair.language + ", [" + pair.text + " and " + sourcePair.text + "]");
+                        Console.WriteLine("conflict : " + it.key + ", " + pair.language + ", [" + pair.text + " and " + resultItem.pairs[index].text + "]");
+                        // 後入れ優先
+                        resultItem.pairs[index] = pair;
                     }
-                    pair.text = sourcePair.text;
                 }
             }
+            return result;
         }
-        public Dictionary<string, Dictionary<string, string>> CreateLanguageKeyTextDictionary()
+
+        public Dictionary<string, Dictionary<string, string?>> CreateLanguageKeyTextDictionary()
         {
-            var languageKeyValues = new Dictionary<string, Dictionary<string, string>>();
+            var languageKeyValues = new Dictionary<string, Dictionary<string, string?>>();
             foreach (var item in items)
             {
                 foreach (var languageValue in item.pairs)
                 {
                     var language = languageValue.language;
                     var value = languageValue.text;
-                    if (!languageKeyValues.TryGetValue(language, out Dictionary<string, string> dict))
+                    if (!languageKeyValues.TryGetValue(language, out var dict))
                     {
-                        dict = new Dictionary<string, string>();
+                        dict = new();
                         languageKeyValues.Add(language, dict);
                     }
                     dict.Add(item.key, value);
@@ -87,7 +120,7 @@ namespace TSKT
                     {
                         columnLanguages.Add(
                             cell.WorksheetColumn().ColumnNumber(),
-                            cell.Value.ToString());
+                            cell.Value.ToString() ?? "");
                     }
                 }
 
