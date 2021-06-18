@@ -12,7 +12,7 @@ namespace TSKT
     {
         static void Main(string[] args)
         {
-            string outputFile = null;
+            string? outputFile = null;
             var inputFiles = new List<string>();
             for (int i = 0; i < args.Length; ++i)
             {
@@ -26,6 +26,12 @@ namespace TSKT
                     outputFile = args[i + 1];
                     ++i;
                 }
+            }
+
+            if (string.IsNullOrEmpty(outputFile))
+            {
+                Console.WriteLine("require out filename.");
+                return;
             }
 
             var outputExtension = Path.GetExtension(outputFile);
@@ -101,16 +107,13 @@ namespace TSKT
                 var index = 2;
                 foreach (var item in mergedSheet.items)
                 {
-                    var key = item.key;
+                    var key = item.Key;
 
                     var row = excelSheet.Row(index);
                     row.Cell(1).Value = key;
 
-                    foreach (var pair in item.pairs)
+                    foreach (var (language, value) in item.pairs)
                     {
-                        var language = pair.language;
-                        var value = pair.text;
-
                         var column = columns.IndexOf(language);
                         if (column < 0)
                         {
