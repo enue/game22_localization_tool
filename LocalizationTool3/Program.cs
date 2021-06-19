@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using Microsoft.Extensions.CommandLineUtils;
 
 namespace TSKT
 {
@@ -12,39 +13,61 @@ namespace TSKT
     {
         static void Main(string[] args)
         {
-            var file = args[0];
+            var app = new CommandLineApplication(throwOnUnexpectedArg: true);
+            app.HelpOption("-?|-h|--help");
 
-            Console.WriteLine("load " + file);
-            var sheet = ReadFile(file);
-
-            for (int i = 1; i < args.Length; ++i)
+            app.Command("convert", command =>
             {
-                var arg = args[i];
-                if (arg == "add")
+                command.HelpOption("-?|-h|--help");
+                var input = command.Argument("input", "input filename");
+                var output = command.Argument("output", "output filename");
+
+                command.OnExecute(() =>
                 {
-                    var path = args[i + 1];
-                    Console.WriteLine("add " + path);
-                    sheet.Add(ReadFile(path));
-                    ++i;
-                }
-                else if (arg == "out")
+                    Console.WriteLine("convert " + input.Value + " to " + output.Value);
+                    var sheet = ReadFile(input.Value);
+                    Write(sheet, output.Value);
+                    return 0;
+                });
+            });
+            app.Command("distinct", command =>
+            {
+                command.HelpOption("-?|-h|--help");
+                var verbose = command.Option("-v|--verbose", "alert when conflicts occur", CommandOptionType.NoValue);
+                var target = command.Argument("target", "target filename");
+
+                command.OnExecute(() =>
                 {
-                    var path = args[i + 1];
-                    Console.WriteLine("out " + path);
-                    Write(sheet, path);
-                    ++i;
-                }
-                else if (arg == "distinct")
+                    Console.WriteLine("distinct " + target.Value);
+                    var sheet = ReadFile(target.Value);
+                    sheet = sheet.Distinct(verbose: verbose.Value() != null);
+                    Write(sheet, target.Value);
+                    return 0;
+                });
+            });
+
+            app.Command("add", command =>
+            {
+                command.HelpOption("-?|-h|--help");
+                var dest = command.Argument("dest", "destination filename", multipleValues: false);
+                var sources = command.Argument("source", "source filenames", multipleValues: true);
+
+                command.OnExecute(() =>
                 {
-                    Console.WriteLine("distinct");
-                    sheet = sheet.Distinct();
-                }
-                else
-                {
-                    Console.WriteLine("invalid argument : " + arg);
-                }
-            }
-            Console.WriteLine("completed");
+                    Console.WriteLine("destination : " + dest.Value);
+                    var sheet = ReadFile(dest.Value);
+                    foreach (var it in sources.Values)
+                    {
+                        Console.WriteLine("add " + it);
+                        var source = ReadFile(it);
+                        sheet.Add(source);
+                    }
+                    Write(sheet, dest.Value);
+                    return 0;
+                });
+            });
+            app.Execute(args);
+
         }
 
         static Sheet ReadFile(string path)
