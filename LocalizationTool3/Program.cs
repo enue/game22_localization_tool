@@ -12,135 +12,75 @@ namespace TSKT
     {
         static void Main(string[] args)
         {
-            string outputFile = null;
-            var inputFiles = new List<string>();
-            for (int i = 0; i < args.Length; ++i)
-            {
-                if (args[i] == "in")
-                {
-                    inputFiles.Add(args[i + 1]);
-                    ++i;
-                }
-                else if (args[i] == "out")
-                {
-                    outputFile = args[i + 1];
-                    ++i;
-                }
-            }
+            var file = args[0];
 
-            var outputExtension = Path.GetExtension(outputFile);
-            if (outputExtension == ".xlsx")
+            Console.WriteLine("load " + file);
+            var sheet = ReadFile(file);
+
+            for (int i = 1; i < args.Length; ++i)
             {
-                JsonsToExcel(inputFiles.ToArray(), outputFile);
+                var arg = args[i];
+                if (arg == "add")
+                {
+                    var path = args[i + 1];
+                    Console.WriteLine("add " + path);
+                    sheet.Add(ReadFile(path));
+                    ++i;
+                }
+                else if (arg == "out")
+                {
+                    var path = args[i + 1];
+                    Console.WriteLine("out " + path);
+                    Write(sheet, path);
+                    ++i;
+                }
+                else if (arg == "distinct")
+                {
+                    Console.WriteLine("distinct");
+                    sheet = sheet.Distinct();
+                }
+                else
+                {
+                    Console.WriteLine("invalid argument : " + arg);
+                }
             }
-            else if (outputExtension == ".xml")
+            Console.WriteLine("completed");
+        }
+
+        static Sheet ReadFile(string path)
+        {
+            var extension = Path.GetExtension(path);
+            if (extension == ".xlsx")
             {
-                ExcelsToXml(inputFiles.ToArray(), outputFile);
+                return Sheet.CreateFromExcel(path);
             }
             else
             {
-                ExcelsToJson(inputFiles.ToArray(), outputFile);
+                var json = File.ReadAllBytes(path);
+                return Utf8Json.JsonSerializer.Deserialize<Sheet>(json);
             }
         }
 
-        static void ExcelsToJson(string[] excelPaths, string jsonPath)
+        static void Write(Sheet sheet, string path)
         {
-            var mergedSheet = new Sheet();
-            var sheets = excelPaths.Select(_ => Sheet.CreateFromExcel(_));
-            foreach (var sheet in sheets)
+            var extension = Path.GetExtension(path);
+            if (extension == ".xml")
             {
-                mergedSheet.Merge(sheet);
+                var xmlString = sheet.ToXmlString();
+                File.WriteAllText(path, xmlString);
             }
-            var json = Utf8Json.JsonSerializer.Serialize(mergedSheet);
-            var prettyJson = Utf8Json.JsonSerializer.PrettyPrintByteArray(json);
-            Console.WriteLine("write " + jsonPath);
-            File.WriteAllBytes(jsonPath, prettyJson);
-            Console.WriteLine("finished");
-        }
-
-        static void ExcelsToXml(string[] excelPaths, string xmlPath)
-        {
-            var mergedSheet = new Sheet();
-            var sheets = excelPaths.Select(_ => Sheet.CreateFromExcel(_));
-            foreach (var sheet in sheets)
+            if (extension == ".xlsx")
             {
-                mergedSheet.Merge(sheet);
-            }
-            var serializer = new XmlSerializer(typeof(Sheet));
-
-            var sb = new StringBuilder();
-            using (var writer = new StringWriter(sb))
-            {
-                serializer.Serialize(writer, mergedSheet);
-            };
-            var xmlString = sb.ToString();
-
-            Console.WriteLine("write " + xmlPath);
-            File.WriteAllText(xmlPath, xmlString);
-            Console.WriteLine("finished");
-        }
-
-        static void JsonsToExcel(string[] jsonPaths, string excelPath)
-        {
-            var mergedSheet = new Sheet();
-            foreach (var jsonPath in jsonPaths)
-            {
-                Console.WriteLine("load " + jsonPath);
-                var json = File.ReadAllBytes(jsonPath);
-                var sheet = Utf8Json.JsonSerializer.Deserialize<Sheet>(json);
-                mergedSheet.Merge(sheet);
-            }
-
-            var book = new XLWorkbook();
-            var excelSheet = book.Worksheets.Add("sheet");
-            excelSheet.SheetView.Freeze(1, 1);
-
-            var columns = new List<string>();
-
-            {
-                var index = 2;
-                foreach (var item in mergedSheet.items)
-                {
-                    var key = item.key;
-
-                    var row = excelSheet.Row(index);
-                    row.Cell(1).Value = key;
-
-                    foreach (var pair in item.pairs)
-                    {
-                        var language = pair.language;
-                        var value = pair.text;
-
-                        var column = columns.IndexOf(language);
-                        if (column < 0)
-                        {
-                            column = columns.Count;
-                            columns.Add(language);
-                        }
-
-                        row.Cell(column + 2).Value = value;
-                    }
-                    ++index;
-                }
-            }
-            {
-                var header = excelSheet.Row(1);
-                header.Cell(1).Value = "key";
-                var index = 2;
-                foreach (var it in columns)
-                {
-                    header.Cell(index).Value = it;
-                    ++index;
-                }
-            }
-
-
-            Console.WriteLine("save " + excelPath);
-            using (var fs = new FileStream(excelPath, FileMode.Create, FileAccess.Write))
-            {
+                var book = sheet.ToXlsx();
+                using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
                 book.SaveAs(fs);
             }
-            Console.WriteLine("finished");
+            else
+            {
+                var json = Utf8Json.JsonSerializer.Serialize(sheet);
+                var prettyJson = Utf8Json.JsonSerializer.PrettyPrintByteArray(json);
+                File.WriteAllBytes(path, prettyJson);
+            }
         }
     }
 }
