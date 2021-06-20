@@ -1,5 +1,4 @@
-﻿using ClosedXML.Excel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -189,54 +188,6 @@ namespace TSKT
             }
 
             book.ToXlsx(filename);
-        }
-
-        public XLWorkbook ToXlsxOld()
-        {
-            var book = new XLWorkbook();
-            var excelSheet = book.Worksheets.Add("sheet");
-            excelSheet.SheetView.Freeze(1, 1);
-
-            var columns = new List<string>();
-
-            {
-                var index = 2;
-                foreach (var item in items)
-                {
-                    var key = item.key;
-
-                    var row = excelSheet.Row(index);
-                    row.Cell(1).Value = key;
-
-                    foreach (var pair in item.pairs)
-                    {
-                        var language = pair.language;
-                        var value = pair.text;
-
-                        var column = columns.IndexOf(language);
-                        if (column < 0)
-                        {
-                            column = columns.Count;
-                            columns.Add(language);
-                        }
-
-                        row.Cell(column + 2).Value = value;
-                    }
-                    ++index;
-                }
-            }
-            {
-                var header = excelSheet.Row(1);
-                header.Cell(1).Value = "key";
-                var index = 2;
-                foreach (var it in columns)
-                {
-                    header.Cell(index).Value = it;
-                    ++index;
-                }
-            }
-
-            return book;
         }
     }
 }
