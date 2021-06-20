@@ -21,16 +21,16 @@ namespace TSKT.Bonn
                 if (it >= 'A' && it <= 'Z')
                 {
                     c *= 26;
-                    c += it - 'A';
+                    c += it - 'A' + 1;
                 }
                 else
                 {
                     r *= 10;
-                    r += it - '1';
+                    r += it - '0';
                 }
             }
-            columnIndex = (uint)c + 1;
-            rowIndex = (uint)r + 1;
+            columnIndex = (uint)c;
+            rowIndex = (uint)r;
 
             this.value = value;
         }
@@ -40,16 +40,24 @@ namespace TSKT.Bonn
             columnIndex = column;
             rowIndex = row;
             var columnName = "";
-            --column;
-            while (true)
             {
-                var c = (char)('A' + (char)(column % 26));
-                columnName = c.ToString() + columnName;
-
-                column /= 26;
-                if (column == 0)
+                var numbers = new List<char>();
+                while (true)
                 {
-                    break;
+                    var q = (column - 1) % 26;
+                    numbers.Add((char)q);
+                    column = (column - 1) / 26;
+                    if (column == 0)
+                    {
+                        break;
+                    }
+                }
+
+                numbers.Reverse();
+                for (int i = 0; i < numbers.Count; ++i)
+                {
+                    var c = 'A' + numbers[i];
+                    columnName += (char)c;
                 }
             }
 
