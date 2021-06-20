@@ -60,5 +60,5 @@ public class Sheet
 }
 ```
 
-https://github.com/enue/Unity_TSKT_Localization/blob/master/Runtime/Sheet.cs
+https://github.com/enue/Unity_TSKT_Localization/blob/master/Assets/Package/Runtime/Sheet.cs
 
