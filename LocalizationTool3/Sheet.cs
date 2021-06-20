@@ -170,7 +170,7 @@ namespace TSKT
 
             var book = new Book();
             var sheet = book.AppendSheet();
-            sheet.Name = "";
+            sheet.Name = "sheet 1";
 
             var header = sheet.AppendRow();
             header.Cells.Add("");
