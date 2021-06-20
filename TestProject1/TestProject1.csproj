@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LocalizationTool3\ExcelToJson.csproj" />
+    <ProjectReference Include="..\Bonn\Bonn.csproj" />
   </ItemGroup>
 
 </Project>

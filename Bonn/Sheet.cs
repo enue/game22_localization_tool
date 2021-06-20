@@ -8,7 +8,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace TSKT.Bonn
 {
-    class Sheet
+    public class Sheet
     {
         readonly Document parent;
         readonly DocumentFormat.OpenXml.Spreadsheet.Sheet sheet;
