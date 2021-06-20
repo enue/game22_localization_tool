@@ -113,7 +113,9 @@ namespace TSKT.Bonn
             {
                 if (cell.CellValue != null && cell.CellValue.TryGetInt(out var index))
                 {
-                    result = parent.SharedStringTable.ElementAt(index).InnerText;
+                    // https://social.msdn.microsoft.com/Forums/ja-JP/9639e844-a3ef-42e4-b808-fb19416737bb/openxmlspreadsheet12391cell2051612434214622447112375123832617812289125?forum=aspnetja
+                    var item = (SharedStringItem)parent.SharedStringTable.ElementAt(index);
+                    result = item.Text?.Text ?? item.InnerText;
                     return true;
                 }
             }
