@@ -1,17 +1,20 @@
 Excel形式の翻訳データをUnityに使いやすいjson形式に変換するツールです
 
-# bat sample
+## usage
 
 ```dos
-"tool/ExcelToJson.exe" in ./source.xlsx out ./output.json
+"tool/ExcelToJson.exe" -h
+"tool/ExcelToJson.exe" convert ./source.xlsx ./output.json
+"tool/ExcelToJson.exe" add ./output.json ./addition.xlsx
+"tool/ExcelToJson.exe" distinct ./output.json --verbose
 ```
 
-# source xlsx sample
+## source xlsx sample
 |key|Japanese|English|
 |:-:|:-:|:-:|
 |Article_ブロンズソード|ブロンズソード|Bronze Sword|
 
-# output json sample
+## output json sample
 
 ```json
 {
@@ -33,7 +36,7 @@ Excel形式の翻訳データをUnityに使いやすいjson形式に変換する
 }
 ```
 
-# unity class sample
+## unity class sample
 
 ```cs
 [System.Serializable]
