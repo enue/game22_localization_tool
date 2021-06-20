@@ -94,9 +94,7 @@ namespace TSKT
             }
             if (extension == ".xlsx")
             {
-                var book = sheet.ToXlsx();
-                using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
-                book.SaveAs(fs);
+                sheet.ToXlsx(path);
             }
             else
             {

@@ -99,50 +99,24 @@ namespace TSKT
         {
             var result = new Sheet();
 
-            using var stream = new FileStream(excelPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using var document = SpreadsheetDocument.Open(stream, isEditable: false);
-            var workbookPart = document.WorkbookPart;
-            if (workbookPart == null)
+            var book = new Book(excelPath);
+            foreach (var sheet in book.Sheets)
             {
-                return null;
-            }
-            var sharedStringTalbePart = workbookPart.SharedStringTablePart;
-            foreach (var sheet in workbookPart.Workbook.Descendants<DocumentFormat.OpenXml.Spreadsheet.Sheet>())
-            {
-                if (sheet == null)
-                {
-                    continue;
-                }
                 var columnLanguages = new Dictionary<int, string>();
-                var worksheetPart = workbookPart.GetPartById(sheet.Id) as WorksheetPart;
-                if (worksheetPart == null)
-                {
-                    continue;
-                }
-                var worksheet = worksheetPart.Worksheet;
                 var column = 1;
-                var topRow = worksheet.Descendants<Row>().First();
-                foreach (Cell cell in topRow.Skip(1))
+                foreach (var cell in sheet.Rows[0].Cells.Skip(1))
                 {
-                    if (TryGetCellValue(cell, sharedStringTalbePart, out var cellValue))
-                    {
-                        columnLanguages.Add(column, cellValue);
-                    }
+                    columnLanguages.Add(column, cell);
                     ++column;
                 }
 
-                foreach (var row in worksheet.Descendants<Row>().Skip(1))
+                foreach (var row in sheet.Rows.Skip(1))
                 {
-                    var cells = row.Descendants<Cell>().ToArray();
-
-                    if (cells.Length == 0)
+                    if (row.Cells.Count == 0)
                     {
                         continue;
                     }
-                    if (!TryGetCellValue(cells[0], sharedStringTalbePart, out var key))
-                    {
-                        continue;
-                    }
+                    var key = row.Cells[0];
                     if (string.IsNullOrEmpty(key))
                     {
                         continue;
@@ -152,21 +126,17 @@ namespace TSKT
                     result.items.Add(item);
                     item.key = key;
 
-                    for (int i = 1; i < cells.Length; ++i)
+                    for (int i = 1; i < row.Cells.Count; ++i)
                     {
                         if (!columnLanguages.TryGetValue(i, out var language))
                         {
                             continue;
                         }
-                        var cell = cells[i];
-                        if (TryGetCellValue(cell, sharedStringTalbePart, out var cellValue))
+                        item.pairs.Add(new Item.Pair()
                         {
-                            item.pairs.Add(new Item.Pair()
-                            {
-                                language = language,
-                                text = cellValue,
-                            });
-                        }
+                            language = language,
+                            text = row.Cells[i],
+                        });
                     }
                 }
             }
@@ -193,31 +163,35 @@ namespace TSKT
             return Utf8Json.JsonSerializer.PrettyPrint(json);
         }
 
-        public void ToExcel()
+        public void ToXlsx(string filename)
         {
-            var output = new MemoryStream();
-            var document = SpreadsheetDocument.Create(output, DocumentFormat.OpenXml.SpreadsheetDocumentType.Workbook);
-            var workbookpart = document.AddWorkbookPart();
-            workbookpart.Workbook = new Workbook();
-            var worksheetPart = workbookpart.AddNewPart<WorksheetPart>();
-            worksheetPart.Worksheet = new Worksheet(new SheetData());
-            var sheets = document.WorkbookPart.Workbook.AppendChild(new Sheets());
-            var sheet = new DocumentFormat.OpenXml.Spreadsheet.Sheet()
-            {
-                Id = document.WorkbookPart.GetIdOfPart(worksheetPart),
-                SheetId = 1,
-                Name = "mySheet"
-            };
-            sheets.Append(sheet);
-            var sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
-            var row = new Row() { RowIndex = 1 };
-            sheetData.Append(row);
-            var cell = new Cell();
-            row.Append(cell);
+            var languageKeyTexts = CreateLanguageKeyTextDictionary();
+            var languages = languageKeyTexts.Keys.ToArray();
 
+            var book = new Book();
+            var sheet = book.AppendSheet();
+            sheet.Name = "";
+
+            var header = sheet.AppendRow();
+            header.Cells.Add("");
+            header.Cells.AddRange(languages);
+
+            foreach(var it in items)
+            {
+                var row = sheet.AppendRow();
+
+                row.Cells.Add(it.key);
+                foreach (var lang in languages)
+                {
+                    var text = it.pairs.Find(_ => _.language == lang).text;
+                    row.Cells.Add(text ?? "");
+                }
+            }
+
+            book.ToXlsx(filename);
         }
 
-        public XLWorkbook ToXlsx()
+        public XLWorkbook ToXlsxOld()
         {
             var book = new XLWorkbook();
             var excelSheet = book.Worksheets.Add("sheet");
@@ -263,46 +237,6 @@ namespace TSKT
             }
 
             return book;
-        }
-
-        // https://docs.microsoft.com/ja-jp/office/open-xml/how-to-retrieve-the-values-of-cells-in-a-spreadsheet
-        static public bool TryGetCellValue(Cell cell, SharedStringTablePart? sharedStringTablePart, out string result)
-        {
-            if (cell.DataType == null)
-            {
-                result = cell.InnerText;
-                return true;
-            }
-            else if (cell.DataType.Value == CellValues.SharedString)
-            {
-                if (cell.CellValue != null && cell.CellValue.TryGetInt(out var index))
-                {
-                    result = sharedStringTablePart.SharedStringTable.ElementAt(index).InnerText;
-                    return true;
-                }
-            }
-            else if (cell.DataType.Value == CellValues.String)
-            {
-                result = cell.InnerText;
-                return true;
-            }
-            else if (cell.DataType.Value == CellValues.Boolean)
-            {
-                if (cell.InnerText == "0")
-                {
-                    result = "FALSE";
-                    return true;
-                }
-                else
-                {
-                    result = "TRUE";
-                    return true;
-                }
-            }
-            Console.WriteLine(cell.DataType.Value.ToString());
-
-            result = "";
-            return false;
         }
     }
 }
