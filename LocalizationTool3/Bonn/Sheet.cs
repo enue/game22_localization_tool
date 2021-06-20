@@ -98,9 +98,15 @@ namespace TSKT.Bonn
         // https://docs.microsoft.com/ja-jp/office/open-xml/how-to-retrieve-the-values-of-cells-in-a-spreadsheet
         bool TryGetCellValue(Cell cell, out string result)
         {
+            var innerText = cell.InnerText;
+            if (cell.CellFormula != null && cell.CellValue != null)
+            {
+                innerText = cell.CellValue.InnerText;
+            }
+
             if (cell.DataType == null)
             {
-                result = cell.InnerText;
+                result = innerText;
                 return true;
             }
             else if (cell.DataType.Value == CellValues.SharedString)
@@ -113,12 +119,12 @@ namespace TSKT.Bonn
             }
             else if (cell.DataType.Value == CellValues.String)
             {
-                result = cell.InnerText;
+                result = innerText;
                 return true;
             }
             else if (cell.DataType.Value == CellValues.Boolean)
             {
-                if (cell.InnerText == "0")
+                if (innerText == "0")
                 {
                     result = "FALSE";
                     return true;
