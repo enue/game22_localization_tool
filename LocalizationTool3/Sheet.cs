@@ -125,16 +125,21 @@ namespace TSKT
                     result.items.Add(item);
                     item.key = key;
 
-                    for (int i = 1; i < row.Cells.Count; ++i)
+                    foreach (var it in columnLanguages)
                     {
-                        if (!columnLanguages.TryGetValue(i, out var language))
+                        string text;
+                        if (it.Key < row.Cells.Count)
                         {
-                            continue;
+                            text = row.Cells[it.Key];
+                        }
+                        else
+                        {
+                            text = "";
                         }
                         item.pairs.Add(new Item.Pair()
                         {
-                            language = language,
-                            text = row.Cells[i],
+                            language = it.Value,
+                            text = text,
                         });
                     }
                 }
