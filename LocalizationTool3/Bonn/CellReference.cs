@@ -40,24 +40,15 @@ namespace TSKT.Bonn
             columnIndex = column;
             rowIndex = row;
             var columnName = "";
+            while (true)
             {
-                var numbers = new List<char>();
-                while (true)
-                {
-                    var q = (column - 1) % 26;
-                    numbers.Add((char)q);
-                    column = (column - 1) / 26;
-                    if (column == 0)
-                    {
-                        break;
-                    }
-                }
+                var c = (column - 1) % 26;
+                columnName = (char)('A' + c) + columnName;
 
-                numbers.Reverse();
-                for (int i = 0; i < numbers.Count; ++i)
+                column = (column - 1) / 26;
+                if (column == 0)
                 {
-                    var c = 'A' + numbers[i];
-                    columnName += (char)c;
+                    break;
                 }
             }
 
