@@ -24,7 +24,7 @@ namespace TSKT
                 command.OnExecute(() =>
                 {
                     Console.WriteLine("convert " + input.Value + " to " + output.Value);
-                    var sheet = ReadFile(input.Value);
+                    var sheet = ReadFile(input.Value) ?? new Sheet();
                     Write(sheet, output.Value);
                     return 0;
                 });

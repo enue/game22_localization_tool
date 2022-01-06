@@ -19,7 +19,7 @@ namespace TSKT
                 public string? text;
             }
 
-            public string key;
+            public string key = "";
             public List<Pair> pairs = new();
         }
 
@@ -94,7 +94,7 @@ namespace TSKT
             return languageKeyValues;
         }
 
-        public static Sheet? CreateFromExcel(string excelPath)
+        public static Sheet CreateFromExcel(string excelPath)
         {
             var result = new Sheet();
 
