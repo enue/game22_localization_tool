@@ -38,12 +38,52 @@ namespace TSKT
                 command.OnExecute(() =>
                 {
                     Console.WriteLine("distinct " + target.Value);
-                    var sheet = ReadFile(target.Value);
-                    sheet = sheet.Distinct(verbose: verbose.Value() != null);
+                    var sheet = ReadFile(target.Value)
+                        .Distinct(verbose: verbose.Value() != null);
                     Write(sheet, target.Value);
                     return 0;
                 });
             });
+            app.Command("rename", command =>
+            {
+                command.HelpOption("-?|-h|--help");
+                command.Command("language", _ =>
+                {
+                    _.HelpOption("-?|-h|--help");
+                    var target = _.Argument("file", "target filename");
+                    var from = _.Argument("from", "target language");
+                    var to = _.Argument("to", "new language");
+
+                    _.OnExecute(() =>
+                    {
+                        Console.WriteLine("rename language " + from.Value + " to " + to.Value + " in " + target.Value);
+                        var sheet = ReadFile(target.Value)
+                            .RenameLanguage(from.Value, to.Value);
+                        Write(sheet, target.Value);
+                        return 0;
+                    });
+                });
+            });
+            app.Command("select", command =>
+            {
+                command.HelpOption("-?|-h|--help");
+                command.Command("languages", _ =>
+                {
+                    _.HelpOption("-?|-h|--help");
+                    var target = _.Argument("file", "target filename");
+                    var languages = _.Argument("languages", "languages", multipleValues: true);
+
+                    _.OnExecute(() =>
+                    {
+                        Console.WriteLine("select languages " + target.Value);
+                        var sheet = ReadFile(target.Value)
+                            .SelectLanguages(languages.Values.ToArray());
+                        Write(sheet, target.Value);
+                        return 0;
+                    });
+                });
+            });
+
 
             app.Command("add", command =>
             {

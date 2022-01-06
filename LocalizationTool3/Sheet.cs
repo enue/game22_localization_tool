@@ -74,6 +74,54 @@ namespace TSKT
             return result;
         }
 
+        public Sheet RenameLanguage(string from, string to)
+        {
+            var result = new Sheet();
+            foreach (var it in items)
+            {
+                var item = new Item()
+                {
+                    key = it.key,
+                };
+                result.items.Add(item);
+
+                foreach (var pair in it.pairs)
+                {
+                    if (pair.language == from)
+                    {
+                        item.pairs.Add(pair with { language = to });
+                    }
+                    else
+                    {
+                        item.pairs.Add(pair);
+                    }
+                }
+            }
+            return result;
+        }
+
+        public Sheet SelectLanguages(params string[] languages)
+        {
+            var result = new Sheet();
+            foreach (var it in items)
+            {
+                var item = new Item()
+                {
+                    key = it.key,
+                };
+                result.items.Add(item);
+
+                foreach (var pair in it.pairs)
+                {
+                    if (languages.Contains(pair.language))
+                    {
+                        item.pairs.Add(pair);
+                    }
+                }
+            }
+            return result;
+        }
+
         public Dictionary<string, Dictionary<string, string?>> CreateLanguageKeyTextDictionary()
         {
             var languageKeyValues = new Dictionary<string, Dictionary<string, string?>>();
