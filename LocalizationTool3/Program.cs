@@ -34,16 +34,14 @@ namespace TSKT
                 command.HelpOption("-?|-h|--help");
                 var input = command.Argument("input", "filename");
                 var output = command.Argument("output", "filename");
-                var source = command.Argument("source", "source column");
-                var target = command.Argument("target", "target column");
-                var sourceLanguage = command.Argument("bcp47source", "bcp47 language");
-                var targetLanguage = command.Argument("bcp47target", "bcp47 language");
+                var source = command.Argument("source", "source language(bcp47)");
+                var target = command.Argument("target", "target language(bcp47)");
 
                 command.OnExecute(() =>
                 {
                     Console.WriteLine("export xliff " + input.Value + " to " + output.Value);
                     var sheet = ReadFile(input.Value);
-                    var bytes = sheet.ToXliff(source.Value, target.Value, sourceLanguage.Value, targetLanguage.Value);
+                    var bytes = sheet.ToXliff(source.Value, target.Value);
                     File.WriteAllBytes(output.Value, bytes);
                     return 0;
                 });

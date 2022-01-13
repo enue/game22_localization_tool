@@ -244,10 +244,10 @@ namespace TSKT
             book.ToXlsx(filename);
         }
 
-        public byte[] ToXliff(string source, string target, string bcp47Source, string bcp47Target)
+        public byte[] ToXliff(string source, string target)
         {
-            var doc = new XliffDocument(bcp47Source);
-            doc.TargetLanguage = bcp47Target;
+            var doc = new XliffDocument(source);
+            doc.TargetLanguage = target;
             var file = new Localization.Xliff.OM.Core.File("f1");
             doc.Files.Add(file);
 
