@@ -244,19 +244,26 @@ namespace TSKT
             book.ToXlsx(filename);
         }
 
-        public byte[] ToXliff(string source, string target)
+        public byte[] ToXliff(string source, string target, string note)
         {
             var doc = new XliffDocument(source);
             doc.TargetLanguage = target;
-            var file = new Localization.Xliff.OM.Core.File("f1");
+            var file = new Localization.Xliff.OM.Core.File("file");
             doc.Files.Add(file);
-
-            var unit = new Unit("u1");
-            file.Containers.Add(unit);
 
             foreach (var it in items)
             {
-                var segment = new Segment(it.key);
+                var unit = new Unit(it.key);
+                unit.Space = Localization.Xliff.OM.Preservation.Preserve;
+
+                var noteText = it.pairs.FirstOrDefault(_ => _.language == note).text;
+                if (!string.IsNullOrEmpty(noteText))
+                {
+                    unit.Notes.Add(new Note(noteText));
+                }
+
+                file.Containers.Add(unit);
+                var segment = new Segment();
                 segment.Source = new Source(it.pairs.FirstOrDefault(_ => _.language == source).text);
                 segment.Target = new Target(it.pairs.FirstOrDefault(_ => _.language == target).text);
                 unit.Resources.Add(segment);
@@ -269,6 +276,49 @@ namespace TSKT
             var writer = new Localization.Xliff.OM.Serialization.XliffWriter(setting);
             writer.Serialize(stream, doc);
             return stream.ToArray();
+        }
+        public static Sheet CreateFromXliff(byte[] bytes)
+        {
+            var reader = new Localization.Xliff.OM.Serialization.XliffReader();
+            using var stream = new MemoryStream(bytes);
+            var doc = reader.Deserialize(stream);
+
+            var result = new Sheet();
+
+            var queue = new Queue<TranslationContainer>();
+            foreach (var it in doc.Files.SelectMany(_ => _.Containers))
+            {
+                queue.Enqueue(it);
+            }
+            while (queue.Count > 0)
+            {
+                var container = queue.Dequeue();
+                if (container is Localization.Xliff.OM.Core.Group group)
+                {
+                    foreach (var it in group.Containers)
+                    {
+                        queue.Enqueue(it);
+                    }
+                }
+                else if (container is Unit unit)
+                {
+                    var note = string.Join("\n", unit.Notes.Select(_ => _.Text));
+                    foreach (var segment in unit.Resources.OfType<Segment>())
+                    {
+                        var item = new Item();
+                        result.items.Add(item);
+                        item.key = unit.Id;
+                        item.pairs.Add(new Item.Pair() { language = doc.SourceLanguage, text = segment.Source.Text.OfType<ResourceStringContent>().FirstOrDefault()?.ToString() });
+                        item.pairs.Add(new Item.Pair() { language = doc.TargetLanguage, text = segment.Target.Text.OfType<ResourceStringContent>().FirstOrDefault()?.ToString() });
+                        if (!string.IsNullOrEmpty(note))
+                        {
+                            item.pairs.Add(new Item.Pair() { language = "note", text = note });
+                        }
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }

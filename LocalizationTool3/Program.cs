@@ -36,12 +36,13 @@ namespace TSKT
                 var output = command.Argument("output", "filename");
                 var source = command.Argument("source", "source language(bcp47)");
                 var target = command.Argument("target", "target language(bcp47)");
+                var note = command.Argument("note", "note column");
 
                 command.OnExecute(() =>
                 {
                     Console.WriteLine("export xliff " + input.Value + " to " + output.Value);
                     var sheet = ReadFile(input.Value);
-                    var bytes = sheet.ToXliff(source.Value, target.Value);
+                    var bytes = sheet.ToXliff(source.Value, target.Value, note.Value);
                     File.WriteAllBytes(output.Value, bytes);
                     return 0;
                 });
@@ -133,6 +134,11 @@ namespace TSKT
             if (extension == ".xlsx")
             {
                 return Sheet.CreateFromExcel(path);
+            }
+            else if (extension == ".xml")
+            {
+                var bytes = File.ReadAllBytes(path);
+                return Sheet.CreateFromXliff(bytes);
             }
             else
             {
