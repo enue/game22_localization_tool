@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using System.IO;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Localization.Xliff.OM.Core;
 
 namespace TSKT
 {
@@ -241,6 +242,33 @@ namespace TSKT
             }
 
             book.ToXlsx(filename);
+        }
+
+        public byte[] ToXliff(string source, string target, string bcp47Source, string bcp47Target)
+        {
+            var doc = new XliffDocument(bcp47Source);
+            doc.TargetLanguage = bcp47Target;
+            var file = new Localization.Xliff.OM.Core.File("f1");
+            doc.Files.Add(file);
+
+            var unit = new Unit("u1");
+            file.Containers.Add(unit);
+
+            foreach (var it in items)
+            {
+                var segment = new Segment(it.key);
+                segment.Source = new Source(it.pairs.FirstOrDefault(_ => _.language == source).text);
+                segment.Target = new Target(it.pairs.FirstOrDefault(_ => _.language == target).text);
+                unit.Resources.Add(segment);
+            }
+
+            using var stream = new MemoryStream();
+
+            var setting = new Localization.Xliff.OM.Serialization.XliffWriterSettings();
+            setting.Indent = true;
+            var writer = new Localization.Xliff.OM.Serialization.XliffWriter(setting);
+            writer.Serialize(stream, doc);
+            return stream.ToArray();
         }
     }
 }

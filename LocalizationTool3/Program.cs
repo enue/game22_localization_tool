@@ -29,6 +29,26 @@ namespace TSKT
                     return 0;
                 });
             });
+            app.Command("export", command =>
+            {
+                command.HelpOption("-?|-h|--help");
+                var input = command.Argument("input", "filename");
+                var output = command.Argument("output", "filename");
+                var source = command.Argument("source", "source column");
+                var target = command.Argument("target", "target column");
+                var sourceLanguage = command.Argument("bcp47source", "bcp47 language");
+                var targetLanguage = command.Argument("bcp47target", "bcp47 language");
+
+                command.OnExecute(() =>
+                {
+                    Console.WriteLine("export xliff " + input.Value + " to " + output.Value);
+                    var sheet = ReadFile(input.Value);
+                    var bytes = sheet.ToXliff(source.Value, target.Value, sourceLanguage.Value, targetLanguage.Value);
+                    File.WriteAllBytes(output.Value, bytes);
+                    return 0;
+                });
+            });
+
             app.Command("distinct", command =>
             {
                 command.HelpOption("-?|-h|--help");
