@@ -135,7 +135,7 @@ namespace TSKT
             {
                 return Sheet.CreateFromExcel(path);
             }
-            else if (extension == ".xml")
+            else if (extension == ".xml" || extension == ".xliff" || extension == ".xlif" || extension == ".xlf")
             {
                 var bytes = File.ReadAllBytes(path);
                 return Sheet.CreateFromXliff(bytes);

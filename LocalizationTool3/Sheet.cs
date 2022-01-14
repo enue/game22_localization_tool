@@ -265,7 +265,11 @@ namespace TSKT
                 file.Containers.Add(unit);
                 var segment = new Segment();
                 segment.Source = new Source(it.pairs.FirstOrDefault(_ => _.language == source).text);
-                segment.Target = new Target(it.pairs.FirstOrDefault(_ => _.language == target).text);
+                var targetText = it.pairs.FirstOrDefault(_ => _.language == target).text;
+                if (!string.IsNullOrEmpty(targetText))
+                {
+                    segment.Target = new Target();
+                }
                 unit.Resources.Add(segment);
             }
 
