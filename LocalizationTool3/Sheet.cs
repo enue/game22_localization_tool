@@ -268,7 +268,7 @@ namespace TSKT
                 var targetText = it.pairs.FirstOrDefault(_ => _.language == target).text;
                 if (!string.IsNullOrEmpty(targetText))
                 {
-                    segment.Target = new Target();
+                    segment.Target = new Target(targetText);
                 }
                 unit.Resources.Add(segment);
             }
