@@ -39,7 +39,7 @@ namespace TSKT
             }
         }
 
-        public Sheet Distinct(bool verbose)
+        public Sheet Distinct(bool verbose, bool selectFirstValue)
         {
             var result = new Sheet();
             foreach (var it in items)
@@ -68,7 +68,10 @@ namespace TSKT
                             Console.WriteLine("conflict : " + it.key + ", " + pair.language + ", [\"" + pair.text + "\" and \"" + resultItem.pairs[index].text + "\"]");
                         }
                         // 後入れ優先
-                        resultItem.pairs[index] = pair;
+                        if (!selectFirstValue)
+                        {
+                            resultItem.pairs[index] = pair;
+                        }
                     }
                 }
             }

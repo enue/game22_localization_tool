@@ -52,13 +52,14 @@ namespace TSKT
             {
                 command.HelpOption("-?|-h|--help");
                 var verbose = command.Option("-v|--verbose", "alert when conflicts occur", CommandOptionType.NoValue);
+                var firstValue = command.Option("-f|--first", "select first value. (default : last)", CommandOptionType.NoValue);
                 var target = command.Argument("target", "target filename");
 
                 command.OnExecute(() =>
                 {
                     Console.WriteLine("distinct " + target.Value);
                     var sheet = ReadFile(target.Value)
-                        .Distinct(verbose: verbose.Value() != null);
+                        .Distinct(verbose: verbose.Value() != null, selectFirstValue: firstValue.Value() != null);
                     Write(sheet, target.Value);
                     return 0;
                 });
