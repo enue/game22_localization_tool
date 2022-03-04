@@ -75,6 +75,25 @@ namespace TSKT
             return result;
         }
 
+        public Sheet Trim()
+        {
+            var result = new Sheet();
+            foreach (var it in items)
+            {
+                var pairs = it.pairs.Where(_ => !string.IsNullOrEmpty(_.text)).ToList();
+                if (pairs.Count > 0)
+                {
+                    var item = new Item()
+                    {
+                        key = it.key,
+                        pairs = pairs,
+                    };
+                    result.items.Add(item);
+                }
+            }
+            return result;
+        }
+
         public Sheet RenameLanguage(string from, string to)
         {
             var result = new Sheet();

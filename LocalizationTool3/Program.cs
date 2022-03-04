@@ -124,6 +124,19 @@ namespace TSKT
                     return 0;
                 });
             });
+            app.Command("trim", command =>
+            {
+                command.HelpOption("-?|-h|--help");
+                var target = command.Argument("target", "target filename");
+
+                command.OnExecute(() =>
+                {
+                    Console.WriteLine("trim " + target.Value);
+                    var sheet = ReadFile(target.Value).Trim();
+                    Write(sheet, target.Value);
+                    return 0;
+                });
+            });
             app.Execute(args);
 
         }
