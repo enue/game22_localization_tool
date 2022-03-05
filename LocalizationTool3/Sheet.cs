@@ -165,13 +165,20 @@ namespace TSKT
             return languageKeyValues;
         }
 
-        public static Sheet CreateFromExcel(string excelPath)
+        public static Sheet CreateFromExcel(string excelPath, string? sheetName)
         {
             var result = new Sheet();
 
             var book = new Book(excelPath);
             foreach (var sheet in book.Sheets)
             {
+                if (sheetName != null)
+                {
+                    if (sheetName != sheet.Name)
+                    {
+                        continue;
+                    }
+                }
                 var columnLanguages = new Dictionary<int, string>();
                 var column = 1;
                 foreach (var cell in sheet.Rows[0].Cells.Skip(1))

@@ -6,6 +6,8 @@
     <AssemblyName>ExcelToJson</AssemblyName>
     <RootNamespace>TSKT</RootNamespace>
     <Nullable>enable</Nullable>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

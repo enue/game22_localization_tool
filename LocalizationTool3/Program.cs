@@ -144,10 +144,18 @@ namespace TSKT
 
         static Sheet ReadFile(string path)
         {
+            var separatorIndex = path.IndexOf('?');
+            string? sheetName = null;
+            if (separatorIndex != -1)
+            {
+                sheetName = path.Substring(separatorIndex + 1);
+                path = path.Substring(0, separatorIndex);
+            }
+
             var extension = Path.GetExtension(path);
             if (extension == ".xlsx")
             {
-                return Sheet.CreateFromExcel(path);
+                return Sheet.CreateFromExcel(path, sheetName);
             }
             else if (extension == ".xml" || extension == ".xliff" || extension == ".xlif" || extension == ".xlf")
             {
