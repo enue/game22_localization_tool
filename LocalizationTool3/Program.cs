@@ -138,6 +138,30 @@ namespace TSKT
                     return 0;
                 });
             });
+            app.Command("merge", command =>
+            {
+                command.HelpOption("-?|-h|--help");
+                var output = command.Argument("output", "filename");
+                var inputs = command.Argument("inputs", "filenames", multipleValues: true);
+
+                command.OnExecute(() =>
+                {
+                    Console.WriteLine("merge " + output.Value);
+                    var sheet = new Sheet();
+                    var trimmedSheet = new Sheet();
+                    foreach (var it in inputs.Values)
+                    {
+                        Console.WriteLine("merge source " + it);
+                        var s = ReadFile(it);
+                        sheet.Add(s);
+                        trimmedSheet.Add(s.Trim());
+                    }
+                    sheet.Add(trimmedSheet);
+                    sheet = sheet.Distinct(verbose: false, selectFirstValue: false);
+                    Write(sheet, output.Value);
+                    return 0;
+                });
+            });
             app.Execute(args);
 
         }
