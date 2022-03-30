@@ -189,7 +189,7 @@ namespace TSKT
             else
             {
                 var json = File.ReadAllBytes(path);
-                return Utf8Json.JsonSerializer.Deserialize<Sheet>(json);
+                return Sheet.CreateFromJson(json);
             }
         }
 
@@ -207,9 +207,8 @@ namespace TSKT
             }
             else
             {
-                var json = Utf8Json.JsonSerializer.Serialize(sheet);
-                var prettyJson = Utf8Json.JsonSerializer.PrettyPrintByteArray(json);
-                File.WriteAllBytes(path, prettyJson);
+                var jsonString = sheet.ToJsonString();
+                File.WriteAllText(path, jsonString);
             }
         }
     }

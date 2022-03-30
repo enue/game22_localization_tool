@@ -239,10 +239,21 @@ namespace TSKT
             return sb.ToString();
         }
 
+        public static Sheet CreateFromJson(ReadOnlySpan<byte> json)
+        {
+            var option = new System.Text.Json.JsonSerializerOptions();
+            option.IncludeFields = true;
+            return System.Text.Json.JsonSerializer.Deserialize<Sheet>(json, option);
+        }
+
         public string ToJsonString()
         {
-            var json = Utf8Json.JsonSerializer.Serialize(this);
-            return Utf8Json.JsonSerializer.PrettyPrint(json);
+            var options = new System.Text.Json.JsonSerializerOptions();
+            options.WriteIndented = true;
+            options.IncludeFields = true;
+            options.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All);
+
+            return System.Text.Json.JsonSerializer.Serialize(this, options);
         }
 
         public void ToXlsx(string filename)
