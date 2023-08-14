@@ -113,8 +113,10 @@ namespace TSKT.Bonn
             {
                 if (cell.CellValue != null && cell.CellValue.TryGetInt(out var index))
                 {
+                    // ふりがな対応処理
                     // https://social.msdn.microsoft.com/Forums/ja-JP/9639e844-a3ef-42e4-b808-fb19416737bb/openxmlspreadsheet12391cell2051612434214622447112375123832617812289125?forum=aspnetja
                     var item = (SharedStringItem)parent.SharedStringTable.ElementAt(index);
+                    item.RemoveAllChildren<PhoneticRun>();
                     result = item.Text?.Text ?? item.InnerText;
                     return true;
                 }
@@ -137,7 +139,6 @@ namespace TSKT.Bonn
                     return true;
                 }
             }
-            Console.WriteLine(cell.DataType.Value.ToString());
 
             result = "";
             return false;
