@@ -21,10 +21,10 @@ namespace TSKT
             }
 
             public string key = "";
-            public List<Pair> pairs = new();
+            public List<Pair> pairs = [];
         }
 
-        public List<Item> items = new();
+        public List<Item> items = [];
 
         public void Add(Sheet source)
         {
@@ -156,7 +156,7 @@ namespace TSKT
                     var value = languageValue.text;
                     if (!languageKeyValues.TryGetValue(language, out var dict))
                     {
-                        dict = new();
+                        dict = [];
                         languageKeyValues.Add(language, dict);
                     }
                     dict.Add(item.key, value);
@@ -275,15 +275,19 @@ namespace TSKT
 
         public byte[] ToXliff(string source, string target, string note)
         {
-            var doc = new XliffDocument(source);
-            doc.TargetLanguage = target;
+            var doc = new XliffDocument(source)
+            {
+                TargetLanguage = target
+            };
             var file = new Localization.Xliff.OM.Core.File("file");
             doc.Files.Add(file);
 
             foreach (var it in items)
             {
-                var unit = new Unit(it.key);
-                unit.Space = Localization.Xliff.OM.Preservation.Preserve;
+                var unit = new Unit(it.key)
+                {
+                    Space = Localization.Xliff.OM.Preservation.Preserve
+                };
 
                 var noteText = it.pairs.FirstOrDefault(_ => _.language == note).text;
                 if (!string.IsNullOrEmpty(noteText))
@@ -292,8 +296,10 @@ namespace TSKT
                 }
 
                 file.Containers.Add(unit);
-                var segment = new Segment();
-                segment.Source = new Source(it.pairs.FirstOrDefault(_ => _.language == source).text);
+                var segment = new Segment
+                {
+                    Source = new Source(it.pairs.FirstOrDefault(_ => _.language == source).text)
+                };
                 var targetText = it.pairs.FirstOrDefault(_ => _.language == target).text;
                 if (!string.IsNullOrEmpty(targetText))
                 {
@@ -304,8 +310,10 @@ namespace TSKT
 
             using var stream = new MemoryStream();
 
-            var setting = new Localization.Xliff.OM.Serialization.XliffWriterSettings();
-            setting.Indent = true;
+            var setting = new Localization.Xliff.OM.Serialization.XliffWriterSettings
+            {
+                Indent = true
+            };
             var writer = new Localization.Xliff.OM.Serialization.XliffWriter(setting);
             writer.Serialize(stream, doc);
             return stream.ToArray();

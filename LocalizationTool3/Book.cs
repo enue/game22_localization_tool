@@ -15,11 +15,11 @@ namespace TSKT
         {
             public class Row
             {
-                public List<string> Cells { get; } = new List<string>();
+                public List<string> Cells { get; } = [];
             }
 
             public string Name { get; set; } = "";
-            public List<Row> Rows { get; } = new List<Row>();
+            public List<Row> Rows { get; } = [];
 
             public Row AppendRow()
             {
@@ -43,7 +43,7 @@ namespace TSKT
             }
         }
 
-        public List<Sheet> Sheets { get; } = new List<Sheet>();
+        public List<Sheet> Sheets { get; } = [];
 
         public Book()
         {
@@ -64,9 +64,9 @@ namespace TSKT
                 };
                 Sheets.Add(sheet);
 
-                foreach (var cell in it.Cells())
+                foreach (var (position, value) in it.Cells())
                 {
-                    sheet.Set(cell.position, cell.value);
+                    sheet.Set(position, value);
                 }
             }
         }

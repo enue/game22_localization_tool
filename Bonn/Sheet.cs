@@ -8,18 +8,17 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace TSKT.Bonn
 {
-    public class Sheet
+    public class Sheet(Document parent, DocumentFormat.OpenXml.Spreadsheet.Sheet sheet)
     {
-        readonly Document parent;
-        readonly DocumentFormat.OpenXml.Spreadsheet.Sheet sheet;
+        readonly Document parent = parent;
+        readonly DocumentFormat.OpenXml.Spreadsheet.Sheet sheet = sheet;
         public string? Name => sheet.Name;
 
         Worksheet Worksheet
         {
             get
             {
-                var worksheetPart = parent.WorkbookPart.GetPartById(sheet.Id) as WorksheetPart;
-                if (worksheetPart == null)
+                if (parent.WorkbookPart.GetPartById(sheet.Id) is not WorksheetPart worksheetPart)
                 {
                     return null;
                 }
@@ -28,12 +27,6 @@ namespace TSKT.Bonn
         }
 
         SheetData SheetData => Worksheet.Elements<SheetData>().First();
-
-        public Sheet(Document parent, DocumentFormat.OpenXml.Spreadsheet.Sheet sheet)
-        {
-            this.parent = parent;
-            this.sheet = sheet;
-        }
 
         public Row GetOrCreateRow(uint rowIndex)
         {

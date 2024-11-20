@@ -97,7 +97,7 @@ namespace TSKT
                     {
                         Console.WriteLine("select languages " + target.Value);
                         var sheet = ReadFile(target.Value)
-                            .SelectLanguages(languages.Values.ToArray());
+                            .SelectLanguages([.. languages.Values]);
                         Write(sheet, target.Value);
                         return 0;
                     });
@@ -172,8 +172,8 @@ namespace TSKT
             string? sheetName = null;
             if (separatorIndex != -1)
             {
-                sheetName = path.Substring(separatorIndex + 1);
-                path = path.Substring(0, separatorIndex);
+                sheetName = path[(separatorIndex + 1)..];
+                path = path[..separatorIndex];
             }
 
             var extension = Path.GetExtension(path);

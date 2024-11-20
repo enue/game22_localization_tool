@@ -8,9 +8,9 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace TSKT.Bonn
 {
-    public class Document
+    public class Document(SpreadsheetDocument document)
     {
-        readonly SpreadsheetDocument document;
+        readonly SpreadsheetDocument document = document;
 
         public WorkbookPart WorkbookPart => document.WorkbookPart ?? document.AddWorkbookPart();
         Workbook Workbook => WorkbookPart.Workbook ??= new Workbook();
@@ -23,11 +23,6 @@ namespace TSKT.Bonn
                     ?? WorkbookPart.AddNewPart<SharedStringTablePart>();
                 return part.SharedStringTable ??= new SharedStringTable();
             }
-        }
-
-        public Document(SpreadsheetDocument document)
-        {
-            this.document = document;
         }
 
         public CellValue CreateCellValue(string text)
