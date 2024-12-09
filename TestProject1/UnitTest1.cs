@@ -23,12 +23,12 @@ namespace TestProject1
         {
             {
                 var pos = new TSKT.Bonn.CellReference(column, row);
-                Assert.AreEqual(text, pos.value);
+                Assert.Equals(text, pos.value);
             }
             {
                 var pos = new TSKT.Bonn.CellReference(text);
-                Assert.AreEqual(column, pos.columnIndex);
-                Assert.AreEqual(row, pos.rowIndex);
+                Assert.Equals(column, pos.columnIndex);
+                Assert.Equals(row, pos.rowIndex);
             }
         }
 
@@ -39,8 +39,8 @@ namespace TestProject1
             {
                 var pos = new TSKT.Bonn.CellReference(i, i);
                 var b = new TSKT.Bonn.CellReference(pos.value);
-                Assert.AreEqual(i, b.columnIndex);
-                Assert.AreEqual(i, b.rowIndex);
+                Assert.Equals(i, b.columnIndex);
+                Assert.Equals(i, b.rowIndex);
             }
         }
     }
